@@ -29,22 +29,33 @@ concentrations = [0.5]*4  # >>1 means very similar supports, <<1 means most supp
 
 
 parser = reqparse.RequestParser()
-parser.add_argument('num_ballots', type=int, required=True)
+parser.add_argument('seatsOpen', type=int, required=True)
 # TODO: ADD location once hooked up to a webform ,(location='form')
+
+# Setting up CORS
+
+
+@app.after_request
+def add_headers(response):
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Headers'] = "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With"
+    response.headers['Access-Control-Allow-Methods'] = "POST, GET, PUT, DELETE, OPTIONS"
+    return response
 
 
 class RCVSimulation(Resource):
-    def post(self):
+    def get(self):
         args = parser.parse_args()
+        print("args", args)
         poc_elected_rcv, poc_elected_atlarge = luce_dirichlet(
             poc_share=poc_share,
             poc_support_for_poc_candidates=poc_support_for_poc_candidates,
             poc_support_for_white_candidates=poc_support_for_white_candidates,
             white_support_for_white_candidates=white_support_for_white_candidates,
             white_support_for_poc_candidates=white_support_for_poc_candidates,
-            num_ballots=args['num_ballots'],
+            num_ballots=num_ballots,
             num_simulations=num_simulations,
-            seats_open=seats_open,
+            seats_open=args['seatsOpen'],
             num_poc_candidates=num_poc_candidates,
             num_white_candidates=num_white_candidates,
             concentrations=concentrations
@@ -54,7 +65,6 @@ class RCVSimulation(Resource):
         return dict({'results': poc_elected_rcv})
 
 
-print(os.path.join('', API_BASE_URL, VERSION, 'simulate'))
 api.add_resource(RCVSimulation, '/' + os.path.join(API_BASE_URL, VERSION, 'simulate'))
 
 if __name__ == '__main__':
