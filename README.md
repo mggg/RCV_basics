@@ -19,3 +19,9 @@ To run the Ranked Choice Vote API server, one need only run the `app.py` script:
 ```
 python app.py
 ```
+
+## Deploying the RCV API Server
+
+As of 11/2020, the API server is deployed on Heroku. New versions of the server are automating deployed when code is pushed to the `heroku_prod` branch.
+
+For more information on how the API Server is deployed through heroku, review this article: https://stackabuse.com/deploying-a-flask-application-to-heroku/
