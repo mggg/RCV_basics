@@ -24,4 +24,8 @@ python app.py
 
 As of 11/2020, the API server is deployed on Heroku. New versions of the server are automating deployed when code is pushed to the `heroku_prod` branch.
 
-For more information on how the API Server is deployed through heroku, review this article: https://stackabuse.com/deploying-a-flask-application-to-heroku/
+For a quick walkthrough on how the API Server is deployed through Heroku, review this article: https://stackabuse.com/deploying-a-flask-application-to-heroku/
+
+For first-time users of Heroku who need to set up accounts and install the Heroku CLI, review this guide: https://devcenter.heroku.com/articles/getting-started-with-python#set-up
+
+N.B. that heroku's auto-deploy will ignore the port used in the local flask app. This needs to be taken into account when connecting to the API via external web applications.
