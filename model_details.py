@@ -46,8 +46,8 @@ def Cambridge_ballot_type(
     poc_elected_Cambridge_atlarge = defaultdict(list)
     candidates = ['A'+str(x) for x in range(num_poc_candidates)]+['B'+str(x) for x in range(num_white_candidates)]
 
-    white_candidates = candidates[num_candidates[0]:]
-    poc_candidates = candidates[:num_candidates[0]]
+    white_candidates = candidates[num_poc_candidates:]
+    poc_candidates = candidates[:num_poc_candidates]
 
     # get ballot type frequencies
     ballot_type_frequencies = pickle.load(Path(DATA_DIR, 'Cambridge_09to17_ballot_types.p').open('rb'))
@@ -314,44 +314,64 @@ def luce_dirichlet(
     concentrations=[1.0, 1.0, 1.0, 1.0],  # poc_for_poc, poc_for_w, w_for_poc, w_for_w.
     max_ballot_length=None
 ):
+
+    print("poc_share: ", poc_share)
+    print("poc_support_for_poc_candidates: ", poc_support_for_poc_candidates)
+    print("poc_support_for_white_candidates: ", poc_support_for_white_candidates)
+    print("white_support_for_white_candidates: ", white_support_for_white_candidates)
+    print("white_support_for_poc_candidates: ", white_support_for_poc_candidates)
+    print("num_ballots: ", num_ballots)
+    print("num_simulations: ", num_simulations)
+    print("seats_open: ", seats_open)
+    print("num_poc_candidates: ", num_poc_candidates)
+    print("num_white_candidates: ", num_white_candidates)
+    print("concentrations: ", concentrations)
+    print("max_ballot_length: ", max_ballot_length)
     if max_ballot_length == None:
         max_ballot_length = num_poc_candidates+num_white_candidates
-    num_candidates = [num_poc_candidates, num_white_candidates]
+    # alphas = poc_for_poc, poc_for_w, w_for_poc, w_for_w.
     alphas = concentrations
     candidates = ['A'+str(x) for x in range(num_poc_candidates)]+['B'+str(x) for x in range(num_white_candidates)]
     race_of_candidate = {x: x[0] for x in candidates}
+    print("race_of_candidate", race_of_candidate)
 
     # simulate
     poc_elected_luce = []
     poc_elected_luce_atlarge = []
     for n in range(num_simulations):
         # get support vectors
-        noise0 = list(np.random.dirichlet([alphas[0]]*num_candidates[0]))+list(np.random.dirichlet([alphas[1]]*num_candidates[1]))
-        noise1 = list(np.random.dirichlet([alphas[2]]*num_candidates[0]))+list(np.random.dirichlet([alphas[3]]*num_candidates[1]))
-        white_support_vector = []
-        poc_support_vector = []
+        noise_poc_voters = list(np.random.dirichlet([alphas[0]]*num_poc_candidates))+list(np.random.dirichlet([alphas[1]]*num_white_candidates))
+        noise_white_voters = list(np.random.dirichlet([alphas[2]]*num_poc_candidates))+list(np.random.dirichlet([alphas[3]]*num_white_candidates))
+        poc_voter_support_vector = []
+        white_voter_support_vector = []
+        # For each candidate, deetermine their support based on their race
         for i, (c, r) in enumerate(race_of_candidate.items()):
+            # For POC candidates
             if r == 'A':
-                white_support_vector.append((white_support_for_poc_candidates*noise1[i]))
-                poc_support_vector.append((poc_support_for_poc_candidates*noise0[i]))
+                white_voter_support_vector.append((white_support_for_poc_candidates*noise_white_voters[i]))
+                poc_voter_support_vector.append((poc_support_for_poc_candidates*noise_poc_voters[i]))
+            # For White candidates
             elif r == 'B':
-                white_support_vector.append((white_support_for_white_candidates*noise1[i]))
-                poc_support_vector.append((poc_support_for_white_candidates*noise0[i]))
+                white_voter_support_vector.append((white_support_for_white_candidates*noise_white_voters[i]))
+                poc_voter_support_vector.append((poc_support_for_white_candidates*noise_poc_voters[i]))
         ballots = []
         numballots = num_ballots
-        sum_to_one([white_support_vector, poc_support_vector])
+        sum_to_one([white_voter_support_vector, poc_voter_support_vector])
+        print("poc_voter_support_vector", poc_voter_support_vector)
+        print("white_voter_support_vector", white_voter_support_vector)
         # white
         for i in range(int(numballots*(1-poc_share))):
             ballots.append(
-                np.random.choice(list(race_of_candidate.keys()), size=len(race_of_candidate), p=white_support_vector, replace=False)
+                np.random.choice(list(race_of_candidate.keys()), size=len(race_of_candidate), p=white_voter_support_vector, replace=False)
             )
         # poc
         for i in range(int(numballots*poc_share)):
             ballots.append(
-                np.random.choice(list(race_of_candidate.keys()), size=len(race_of_candidate), p=poc_support_vector, replace=False)
+                np.random.choice(list(race_of_candidate.keys()), size=len(race_of_candidate), p=poc_voter_support_vector, replace=False)
             )
         # winners
         ballots = [b[:max_ballot_length] for b in ballots]
+        print("ballots", ballots)
         winners = cw.rcv_run(ballots.copy(), candidates, seats_open, cincinnati_transfer)
         poc_elected_luce.append(len([w for w in winners if w[0] == 'A']))
         atlargewinners = cw.at_large_run(ballots.copy(), candidates, seats_open)
@@ -386,25 +406,25 @@ def bradley_terry_dirichlet(
     poc_elected_atlarge = []
     for n in range(num_simulations):
         # get support vectors
-        noise0 = list(np.random.dirichlet([alphas[0]]*num_candidates[0]))+list(np.random.dirichlet([alphas[1]]*num_candidates[1]))
-        noise1 = list(np.random.dirichlet([alphas[2]]*num_candidates[0]))+list(np.random.dirichlet([alphas[3]]*num_candidates[1]))
-        white_support_vector = []
-        poc_support_vector = []
+        noise0 = list(np.random.dirichlet([alphas[0]]*num_poc_candidates))+list(np.random.dirichlet([alphas[1]]*num_white_candidates))
+        noise1 = list(np.random.dirichlet([alphas[2]]*num_poc_candidates))+list(np.random.dirichlet([alphas[3]]*num_white_candidates))
+        white_voter_support_vector = []
+        poc_voter_support_vector = []
         for i, (c, r) in enumerate(race_of_candidate.items()):
             if r == 'A':
-                white_support_vector.append((white_support_for_poc_candidates*noise1[i]))
-                poc_support_vector.append((poc_support_for_poc_candidates*noise0[i]))
+                white_voter_support_vector.append((white_support_for_poc_candidates*noise1[i]))
+                poc_voter_support_vector.append((poc_support_for_poc_candidates*noise0[i]))
             elif r == 'B':
-                white_support_vector.append((white_support_for_white_candidates*noise1[i]))
-                poc_support_vector.append((poc_support_for_white_candidates*noise0[i]))
+                white_voter_support_vector.append((white_support_for_white_candidates*noise1[i]))
+                poc_voter_support_vector.append((poc_support_for_white_candidates*noise0[i]))
 
         ballots = []
         numballots = num_ballots
         ballots = paired_comparison_mcmc(
             num_ballots,
             {
-                0: {x: poc_support_vector[i] for i, x in enumerate(candidates)},
-                1: {x: white_support_vector[i] for i, x in enumerate(candidates)}
+                0: {x: poc_voter_support_vector[i] for i, x in enumerate(candidates)},
+                1: {x: white_voter_support_vector[i] for i, x in enumerate(candidates)}
             },
             None,
             candidates,
