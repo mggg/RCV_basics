@@ -172,19 +172,20 @@ poc_elected_Cambridge, poc_elected_Cambridge_atlarge = Cambridge_ballot_type(
     scenarios_to_run = ['A', 'B', 'C', 'D'],
     max_ballot_length = max_ballot_length
 )
+print("poc_elected_Cambridge", poc_elected_Cambridge)
 
 print("\n Cambridge sampler predictions in order:")
 if run_at_large_as_well:
     for i, c in enumerate(['A', 'B', 'C', 'D']):
       print("{:.1f} ({:.1f}) &".format(np.mean(poc_elected_Cambridge[c]), np.mean(poc_elected_Cambridge_atlarge[c])), end=" ")
-    print("{:.1f} ({:.1f})".format(
+    print("\nAverage of Averages:{:.1f} ({:.1f})".format(
       np.mean([np.mean(poc_elected_Cambridge[c]) for c in ['A', 'B', 'C', 'D']]),
       np.mean([np.mean(poc_elected_Cambridge_atlarge[c]) for c in ['A', 'B', 'C', 'D']])
     ))
 else:
     for i, c in enumerate(['A', 'B', 'C', 'D']):
       print("{:.1f} &".format(np.mean(poc_elected_Cambridge[c]), np.mean(poc_elected_Cambridge_atlarge[c])), end=" ")
-    print("{:.1f} ".format(
+    print("\nAverage of Averages: {:.1f}: ".format(
       np.mean([np.mean(poc_elected_Cambridge[c]) for c in ['A', 'B', 'C', 'D']]),
       np.mean([np.mean(poc_elected_Cambridge_atlarge[c]) for c in ['A', 'B', 'C', 'D']])
     ))

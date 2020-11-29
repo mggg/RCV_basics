@@ -20,7 +20,7 @@ def sum_to_one(list_of_vectors):
         n = np.argmax(v)  # fix highest value
         v[n] = 1-sum([x for i, x in enumerate(v) if i != n])
 
-
+# Cambridge Sampler Model
 def Cambridge_ballot_type(
     poc_share=0.33,
     poc_support_for_poc_candidates=0.7,
@@ -197,7 +197,7 @@ def Cambridge_ballot_type(
             poc_elected_Cambridge_atlarge[scenario].append(len([x for x in atlargewinners if x[0] == 'A']))
     return poc_elected_Cambridge, poc_elected_Cambridge_atlarge
 
-
+# Alternating Crossover Model
 def BABABA(
     poc_share=0.33,
     poc_support_for_poc_candidates=0.7,
@@ -314,26 +314,12 @@ def luce_dirichlet(
     concentrations=[1.0, 1.0, 1.0, 1.0],  # poc_for_poc, poc_for_w, w_for_poc, w_for_w.
     max_ballot_length=None
 ):
-
-    print("poc_share: ", poc_share)
-    print("poc_support_for_poc_candidates: ", poc_support_for_poc_candidates)
-    print("poc_support_for_white_candidates: ", poc_support_for_white_candidates)
-    print("white_support_for_white_candidates: ", white_support_for_white_candidates)
-    print("white_support_for_poc_candidates: ", white_support_for_poc_candidates)
-    print("num_ballots: ", num_ballots)
-    print("num_simulations: ", num_simulations)
-    print("seats_open: ", seats_open)
-    print("num_poc_candidates: ", num_poc_candidates)
-    print("num_white_candidates: ", num_white_candidates)
-    print("concentrations: ", concentrations)
-    print("max_ballot_length: ", max_ballot_length)
     if max_ballot_length == None:
         max_ballot_length = num_poc_candidates+num_white_candidates
     # alphas = poc_for_poc, poc_for_w, w_for_poc, w_for_w.
     alphas = concentrations
     candidates = ['A'+str(x) for x in range(num_poc_candidates)]+['B'+str(x) for x in range(num_white_candidates)]
     race_of_candidate = {x: x[0] for x in candidates}
-    print("race_of_candidate", race_of_candidate)
 
     # simulate
     poc_elected_luce = []
@@ -357,8 +343,6 @@ def luce_dirichlet(
         ballots = []
         numballots = num_ballots
         sum_to_one([white_voter_support_vector, poc_voter_support_vector])
-        print("poc_voter_support_vector", poc_voter_support_vector)
-        print("white_voter_support_vector", white_voter_support_vector)
         # white
         for i in range(int(numballots*(1-poc_share))):
             ballots.append(
@@ -371,7 +355,6 @@ def luce_dirichlet(
             )
         # winners
         ballots = [b[:max_ballot_length] for b in ballots]
-        print("ballots", ballots)
         winners = cw.rcv_run(ballots.copy(), candidates, seats_open, cincinnati_transfer)
         poc_elected_luce.append(len([w for w in winners if w[0] == 'A']))
         atlargewinners = cw.at_large_run(ballots.copy(), candidates, seats_open)
