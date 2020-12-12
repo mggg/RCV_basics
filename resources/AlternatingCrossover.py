@@ -1,5 +1,5 @@
 from flask_restful import Resource, reqparse
-from model_details import BABABA
+from model_details import Alternating_crossover_webapp
 from common.default_arguments import addCommonArguments
 from common.default_transforms import (
     poc_share_transform,
@@ -24,11 +24,10 @@ parser.add_argument('minMinCandidateAgreement-alternatingCrossover', dest="minMi
 parser.add_argument('minMajCandidateAgreement-alternatingCrossover', dest="minMajCandidateAgreement", required=True, type=float)
 
 
-
 class AlternatingCrossover(Resource):
     def get(self):
         args = parser.parse_args()
-        poc_elected_rcv, _ = BABABA(
+        poc_elected_rcv, _ = Alternating_crossover_webapp(
             poc_share=poc_share_transform(args),
             poc_support_for_poc_candidates=poc_support_for_poc_candidates_transform(args),
             poc_support_for_white_candidates=poc_support_for_white_candidates_transform(args),
@@ -38,7 +37,7 @@ class AlternatingCrossover(Resource):
             seats_open=seats_open_transform(args),
             num_white_candidates=num_poc_candidates_transform(args),
             num_poc_candidates=num_white_candidates_transform(args),
-            scenarios_to_run=ballot_type_transform(args),
+            voting_preferences=ballot_type_transform(args),
             num_simulations=num_simulations_transform(args),
         )
         return dict({'poc_elected_rcv': poc_elected_rcv})

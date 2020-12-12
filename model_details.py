@@ -20,28 +20,26 @@ def sum_to_one(list_of_vectors):
         n = np.argmax(v)  # fix highest value
         v[n] = 1-sum([x for i, x in enumerate(v) if i != n])
 
-# Cambridge Sampler Model
+
 def Cambridge_ballot_type(
-    poc_share=0.33,
-    poc_support_for_poc_candidates=0.7,
-    poc_support_for_white_candidates=0.3,
-    white_support_for_white_candidates=0.8,
-    white_support_for_poc_candidates=0.2,
-    num_ballots=1000,
-    num_simulations=100,
-    seats_open=3,
-    num_poc_candidates=2,
-    num_white_candidates=3,
-    scenarios_to_run=['A', 'B', 'C', 'D'],
-    max_ballot_length=None,
-    verbose=False
-):
+        poc_share=0.33,
+        poc_support_for_poc_candidates=0.7,
+        poc_support_for_white_candidates=0.3,
+        white_support_for_white_candidates=0.8,
+        white_support_for_poc_candidates=0.2,
+        num_ballots=1000,
+        num_simulations=100,
+        seats_open=3,
+        num_poc_candidates=2,
+        num_white_candidates=3,
+        scenarios_to_run=['A', 'B', 'C', 'D'],
+        max_ballot_length=None,
+        verbose=False):
+    # Cambridge Sampler Model
     if max_ballot_length == None:
         max_ballot_length = num_poc_candidates+num_white_candidates
     num_candidates = [num_poc_candidates, num_white_candidates]
-    minority_share = poc_share
-    preference_strengths = [poc_support_for_poc_candidates, white_support_for_white_candidates]
-    num_seats = seats_open
+    poc_share = poc_share
     poc_elected_Cambridge = defaultdict(list)
     poc_elected_Cambridge_atlarge = defaultdict(list)
     candidates = ['A'+str(x) for x in range(num_poc_candidates)]+['B'+str(x) for x in range(num_white_candidates)]
@@ -77,7 +75,7 @@ def Cambridge_ballot_type(
             ballots = []
 
             # white voters white first
-            for b in range(int(num_ballots*(1-minority_share)*preference_strengths[1])):
+            for b in range(int(num_ballots*(1-poc_share)*white_support_for_white_candidates)):
                 ballot_type = list(choice(
                     list(white_first_probs.keys()),
                     p=list(white_first_probs.values())
@@ -101,7 +99,7 @@ def Cambridge_ballot_type(
                 ballots.append(ballot[:max_ballot_length])
 
             # white voters poc first
-            for b in range(int(num_ballots*(1-minority_share)*(1-preference_strengths[1]))):
+            for b in range(int(num_ballots*(1-poc_share)*(white_support_for_poc_candidates))):
                 ballot_type = list(choice(
                     list(poc_first_probs.keys()),
                     p=list(poc_first_probs.values())
@@ -125,7 +123,7 @@ def Cambridge_ballot_type(
                 ballots.append(ballot[:max_ballot_length])
 
             # poc voters poc first
-            for b in range(int(num_ballots*(minority_share)*preference_strengths[0])):
+            for b in range(int(num_ballots*(poc_share)*poc_support_for_poc_candidates)):
                 ballot_type = list(choice(
                     list(poc_first_probs.keys()),
                     p=list(poc_first_probs.values())
@@ -154,7 +152,7 @@ def Cambridge_ballot_type(
                 ballots.append(ballot[:max_ballot_length])
 
             # poc voters white first
-            for b in range(int(num_ballots*(minority_share)*(1-preference_strengths[0]))):
+            for b in range(int(num_ballots*(poc_share)*(poc_support_for_white_candidates))):
                 ballot_type = list(choice(
                     list(white_first_probs.keys()),
                     p=list(white_first_probs.values())
@@ -184,7 +182,7 @@ def Cambridge_ballot_type(
             winners = cw.rcv_run(
                 ballots.copy(),
                 candidates,
-                num_seats,
+                seats_open,
                 cincinnati_transfer,
             )
             poc_elected_Cambridge[scenario].append(len([x for x in winners if x[0] == 'A']))
@@ -192,12 +190,12 @@ def Cambridge_ballot_type(
             atlargewinners = cw.at_large_run(
                 ballots.copy(),
                 candidates,
-                num_seats
+                seats_open
             )
             poc_elected_Cambridge_atlarge[scenario].append(len([x for x in atlargewinners if x[0] == 'A']))
     return poc_elected_Cambridge, poc_elected_Cambridge_atlarge
 
-# Alternating Crossover Model
+
 def BABABA(
     poc_share=0.33,
     poc_support_for_poc_candidates=0.7,
@@ -213,6 +211,7 @@ def BABABA(
     max_ballot_length=None,
     verbose=False
 ):
+    # Alternating Crossover Model
     if max_ballot_length == None:
         max_ballot_length = num_poc_candidates+num_white_candidates
     candidates = ['A'+str(x) for x in range(num_poc_candidates)]+['B'+str(x) for x in range(num_white_candidates)]
@@ -301,19 +300,18 @@ def BABABA(
 
 
 def luce_dirichlet(
-    poc_share=0.33,
-    poc_support_for_poc_candidates=0.7,
-    poc_support_for_white_candidates=0.3,
-    white_support_for_white_candidates=0.8,
-    white_support_for_poc_candidates=0.2,
-    num_ballots=1000,
-    num_simulations=100,
-    seats_open=3,
-    num_poc_candidates=2,
-    num_white_candidates=3,
-    concentrations=[1.0, 1.0, 1.0, 1.0],  # poc_for_poc, poc_for_w, w_for_poc, w_for_w.
-    max_ballot_length=None
-):
+        poc_share=0.33,
+        poc_support_for_poc_candidates=0.7,
+        poc_support_for_white_candidates=0.3,
+        white_support_for_white_candidates=0.8,
+        white_support_for_poc_candidates=0.2,
+        num_ballots=1000,
+        num_simulations=100,
+        seats_open=3,
+        num_poc_candidates=2,
+        num_white_candidates=3,
+        concentrations=[1.0, 1.0, 1.0, 1.0],  # poc_for_poc, poc_for_w, w_for_poc, w_for_w.
+        max_ballot_length=None):
     if max_ballot_length == None:
         max_ballot_length = num_poc_candidates+num_white_candidates
     # alphas = poc_for_poc, poc_for_w, w_for_poc, w_for_w.
@@ -364,19 +362,18 @@ def luce_dirichlet(
 
 
 def bradley_terry_dirichlet(
-    poc_share=0.33,
-    poc_support_for_poc_candidates=0.7,
-    poc_support_for_white_candidates=0.3,
-    white_support_for_white_candidates=0.8,
-    white_support_for_poc_candidates=0.2,
-    num_ballots=1000,
-    num_simulations=100,
-    seats_open=3,
-    num_poc_candidates=2,
-    num_white_candidates=3,
-    concentrations=[1.0, 1.0, 1.0, 1.0],  # poc_for_poc, poc_for_w, w_for_poc, w_for_w
-    max_ballot_length=None
-):
+        poc_share=0.33,
+        poc_support_for_poc_candidates=0.7,
+        poc_support_for_white_candidates=0.3,
+        white_support_for_white_candidates=0.8,
+        white_support_for_poc_candidates=0.2,
+        num_ballots=1000,
+        num_simulations=100,
+        seats_open=3,
+        num_poc_candidates=2,
+        num_white_candidates=3,
+        concentrations=[1.0, 1.0, 1.0, 1.0],  # poc_for_poc, poc_for_w, w_for_poc, w_for_w
+        max_ballot_length=None):
     if max_ballot_length == None:
         max_ballot_length = num_poc_candidates+num_white_candidates
     num_candidates = [num_poc_candidates, num_white_candidates]
@@ -424,3 +421,256 @@ def bradley_terry_dirichlet(
         poc_elected_atlarge.append(len([x for x in atlargewinners if x[0] == 'A']))
 
     return poc_elected, poc_elected_atlarge
+
+
+# An enum to define possible voter preferences for a voting group towards a candidate group
+# Identical - all voters from that group have the same preference for a candidate group
+# Random - each voter from that group has a randomly selected preference for a candidate group
+voting_agreement = {
+    'random': 0,
+    'identical': 1,
+}
+
+# Load the ballot_type frequencies once into memory, used in the Cambridge model below
+ballot_type_frequencies = pickle.load(Path(DATA_DIR, 'Cambridge_09to17_ballot_types.p').open('rb'))
+
+
+def Cambridge_ballot_type_webapp(
+        poc_share=0.33,
+        poc_support_for_poc_candidates=0.7,
+        poc_support_for_white_candidates=0.3,
+        white_support_for_white_candidates=0.8,
+        white_support_for_poc_candidates=0.2,
+        num_ballots=1000,
+        num_simulations=100,
+        seats_open=3,
+        num_poc_candidates=2,
+        num_white_candidates=3,
+        voting_preferences=[voting_agreement['identical'], voting_agreement['identical'], voting_agreement['identical'], voting_agreement['identical']],
+        max_ballot_length=None,
+        verbose=False):
+    # Cambridge Sampler Model
+    # NOTE: This version of the function has been significantly refactored. Variable names may not always line up
+    #       with the original version of this function, though an effort to synchronize them has been made.
+    if max_ballot_length == None:
+        max_ballot_length = num_poc_candidates+num_white_candidates
+    num_candidates = num_poc_candidates + num_white_candidates
+    poc_elected_Cambridge = []
+    white_share = 1 - poc_share
+    white_white_pref, white_poc_pref, poc_poc_pref, poc_white_pref = voting_preferences
+    poc_candidates = ['A'+str(x) for x in range(num_poc_candidates)]
+    white_candidates = ['B'+str(x) for x in range(num_white_candidates)]
+
+    # get ballot type frequencies, marginalized by the subset of interest
+    # white-first probabilities for each ballot variant
+    white_first_probs = {x: p for x, p in ballot_type_frequencies.items() if x[0] == 'W'}
+    sum_white_first_probs = sum(white_first_probs.values())
+    white_first_probs = {x: p/sum_white_first_probs for x, p in white_first_probs.items()}
+    # poc-first probabilities, for each ballot variant
+    poc_first_probs = {x: p for x, p in ballot_type_frequencies.items() if x[0] == 'C'}
+    sum_poc_first_probs = sum(poc_first_probs.values())
+    poc_first_probs = {x: p/sum_poc_first_probs for x, p in poc_first_probs.items()}
+
+    # consolidate to only prefixes that are valid based on number of candidates
+    # I.e.: shorten and aggregate all ballots that have too many candidate
+    # for white candidates
+    consolidated_probs = {}
+    for shortened_ballot in set([x[:num_candidates] for x in white_first_probs.keys()]):
+        consolidated_probs[shortened_ballot] = sum(
+            [white_first_probs[x] for x in white_first_probs if x[:num_candidates] == shortened_ballot]
+        )
+    white_first_probs = consolidated_probs
+    # for poc candidates
+    consolidated_probs = {}
+    for shortened_ballot in set([x[:num_candidates] for x in poc_first_probs.keys()]):
+        consolidated_probs[shortened_ballot] = sum(
+            [poc_first_probs[x] for x in poc_first_probs if x[:num_candidates] == shortened_ballot]
+        )
+    poc_first_probs = consolidated_probs
+
+    # Split the total number of ballots along the support lines
+    num_white_white_voters = int(num_ballots*(white_share)*white_support_for_white_candidates)
+    num_white_poc_voters = int(num_ballots*(white_share)*white_support_for_poc_candidates)
+    num_poc_poc_voters = int(num_ballots*(poc_share)*poc_support_for_poc_candidates)
+    num_poc_white_voters = int(num_ballots*(poc_share)*poc_support_for_white_candidates)
+
+    # define candidate preferences across voting groups
+    white_voter_candidate_ordering = {
+        'W': list(reversed(white_candidates) if white_white_pref == voting_agreement['identical'] else np.random.permutation(white_candidates)),
+        'C': list(reversed(poc_candidates) if white_poc_pref == voting_agreement['identical'] else np.random.permutation(poc_candidates))
+    }
+    poc_voter_candidate_ordering = {
+        'W': list(reversed(white_candidates) if poc_white_pref == voting_agreement['identical'] else np.random.permutation(white_candidates)),
+        'C': list(reversed(poc_candidates) if poc_poc_pref == voting_agreement['identical'] else np.random.permutation(poc_candidates))
+    }
+
+    for n in range(num_simulations):
+        ballots = []
+
+        # white voters white-candidate first on ballot
+        for b in range(num_white_white_voters):
+            # Select a unique type of ballot from the list of possible ballots with white first
+            selected_ballot = list(choice(
+                list(white_first_probs.keys()),
+                p=list(white_first_probs.values())
+            ))[:max_ballot_length]
+            ballot = []
+            candidate_ordering = {
+                'W': list(reversed(white_candidates) if white_white_pref == voting_agreement['identical'] else np.random.permutation(white_candidates)),
+                'C': list(reversed(poc_candidates) if white_poc_pref == voting_agreement['identical'] else np.random.permutation(poc_candidates))
+            }
+            for j in range(len(selected_ballot)):
+                if len(candidate_ordering[selected_ballot[j]]) == 0:
+                    # Short circuit if we've run out of candidates to fulfill this selected_ballot
+                    break
+                else:
+                    ballot.append(candidate_ordering[selected_ballot[j]].pop())
+            ballots.append(ballot[:max_ballot_length])
+
+        # white voters poc first
+        for b in range(num_white_poc_voters):
+            selected_ballot = list(choice(
+                list(poc_first_probs.keys()),
+                p=list(poc_first_probs.values())
+            ))[:max_ballot_length]
+            ballot = []
+            candidate_ordering = {
+                'W': list(reversed(white_candidates) if white_white_pref == voting_agreement['identical'] else np.random.permutation(white_candidates)),
+                'C': list(reversed(poc_candidates) if white_poc_pref == voting_agreement['identical'] else np.random.permutation(poc_candidates))
+            }
+            for j in range(len(selected_ballot)):
+                if len(candidate_ordering[selected_ballot[j]]) == 0:
+                    break
+                else:
+                    ballot.append(candidate_ordering[selected_ballot[j]].pop())
+            ballots.append(ballot[:max_ballot_length])
+
+        # poc voters poc first
+        for b in range(num_poc_poc_voters):
+            selected_ballot = list(choice(
+                list(poc_first_probs.keys()),
+                p=list(poc_first_probs.values())
+            ))[:max_ballot_length]
+            ballot = []
+            candidate_ordering = {
+                'W': list(reversed(white_candidates) if poc_white_pref == voting_agreement['identical'] else np.random.permutation(white_candidates)),
+                'C': list(reversed(poc_candidates) if poc_poc_pref == voting_agreement['identical'] else np.random.permutation(poc_candidates))
+            }
+            for j in range(len(selected_ballot)):
+                if len(candidate_ordering[selected_ballot[j]]) == 0:
+                    break
+                else:
+                    ballot.append(candidate_ordering[selected_ballot[j]].pop())
+            ballots.append(ballot[:max_ballot_length])
+
+        # poc voters white first
+        for b in range(num_poc_white_voters):
+            selected_ballot = list(choice(
+                list(white_first_probs.keys()),
+                p=list(white_first_probs.values())
+            ))[:max_ballot_length]
+            ballot = []
+            candidate_ordering = {
+                'W': list(reversed(white_candidates) if poc_white_pref == voting_agreement['identical'] else np.random.permutation(white_candidates)),
+                'C': list(reversed(poc_candidates) if poc_poc_pref == voting_agreement['identical'] else np.random.permutation(poc_candidates))
+            }
+            for j in range(len(selected_ballot)):
+                if len(candidate_ordering[selected_ballot[j]]) == 0:
+                    break
+                else:
+                    ballot.append(candidate_ordering[selected_ballot[j]].pop())
+            ballots.append(ballot[:max_ballot_length])
+
+        winners = cw.rcv_run(
+            ballots.copy(),
+            poc_candidates + white_candidates,
+            seats_open,
+            cincinnati_transfer,
+        )
+        poc_elected_Cambridge.append(len([x for x in winners if x[0] == 'A']))
+
+    return poc_elected_Cambridge, None
+
+
+def Alternating_crossover_webapp(
+    poc_share=0.33,
+    poc_support_for_poc_candidates=0.7,
+    poc_support_for_white_candidates=0.3,
+    white_support_for_white_candidates=0.8,
+    white_support_for_poc_candidates=0.2,
+    num_ballots=1000,
+    num_simulations=100,
+    seats_open=3,
+    num_poc_candidates=2,
+    num_white_candidates=3,
+    voting_preferences=[voting_agreement['identical'], voting_agreement['identical'], voting_agreement['identical'], voting_agreement['identical']],
+    max_ballot_length=None,
+    verbose=False
+):
+    # Alternating Crossover Model, adapted from the BABABA model above
+    if max_ballot_length == None:
+        max_ballot_length = num_poc_candidates+num_white_candidates
+    white_candidates = ['B'+str(x) for x in range(num_white_candidates)]
+    poc_candidates = ['A'+str(x) for x in range(num_poc_candidates)]
+    white_share = 1 - poc_share
+    # white_bloc_pref, white_cross_pref, poc_bloc_pref, poc_cross_pref = voting_preferences
+    white_white_pref, white_poc_pref, poc_poc_pref, poc_white_pref = voting_preferences
+
+    poc_elected_ac = []
+    num_white_bloc_voters = int(num_ballots*(white_share)*white_support_for_white_candidates)
+    num_white_cross_voters = int(num_ballots*(white_share)*white_support_for_poc_candidates)
+    num_poc_bloc_voters = int(num_ballots*(poc_share)*poc_support_for_poc_candidates)
+    num_poc_cross_voters = int(num_ballots*(poc_share)*poc_support_for_white_candidates)
+    for n in range(num_simulations):
+        ac_ballots = []
+        # white bloc
+        a = int(num_ballots*white_share*white_support_for_white_candidates)
+        ac_ballots.extend(
+            [bloc_ballots(white_white_pref, white_candidates, white_poc_pref, poc_candidates)[:max_ballot_length] for x in range(num_white_bloc_voters)]
+        )
+        # white cross
+        a = int(num_ballots*white_share*white_support_for_poc_candidates)
+        ac_ballots.extend(
+            [cross_ballots(white_white_pref, white_candidates, white_poc_pref, poc_candidates)[:max_ballot_length] for x in range(num_white_cross_voters)]
+        )
+        # poc bloc
+        a = int(num_ballots*poc_share*poc_support_for_poc_candidates)
+        ac_ballots.extend(
+            [bloc_ballots(poc_poc_pref, poc_candidates, poc_white_pref, white_candidates)[:max_ballot_length] for x in range(num_poc_bloc_voters)]
+        )
+        # poc cross
+        a = int(num_ballots*poc_share*poc_support_for_white_candidates)
+        ac_ballots.extend(
+            [cross_ballots(poc_poc_pref, poc_candidates, poc_white_pref, white_candidates)[:max_ballot_length] for x in range(num_poc_cross_voters)]
+        )
+
+        if verbose:
+            print(ac_ballots)
+
+        # winners
+        winners = cw.rcv_run(ac_ballots.copy(), white_candidates + poc_candidates, seats_open, cincinnati_transfer)
+        poc_elected_ac.append(len([w for w in winners if w[0] == 'A']))
+
+    return poc_elected_ac, None
+
+
+def interleave(x, y):
+    '''
+    Interleaves two lists x and y
+    '''
+    x = list(x)
+    y = list(y)
+    minlength = min(len(x), len(y))
+    return [z for pair in zip(x[:minlength], y[:minlength]) for z in pair]+x[minlength:]+y[minlength:]
+
+
+def bloc_ballots(same_group_pref, same_group_candidates, opposite_group_pref, opposite_group_candidates):
+    same_group_candidates_order = same_group_candidates if same_group_pref == voting_agreement['identical'] else list(np.random.permutation(same_group_candidates))
+    opposite_group_candidates_order = opposite_group_candidates if opposite_group_pref == voting_agreement['identical'] else list(np.random.permutation(opposite_group_candidates))
+    return same_group_candidates_order + opposite_group_candidates_order
+
+
+def cross_ballots(same_group_pref, same_group_candidates, opposite_group_pref, opposite_group_candidates):
+    cross_opposite_group_candidates = opposite_group_candidates if opposite_group_pref == voting_agreement['identical'] else list(np.random.permutation(opposite_group_candidates))
+    cross_same_group_candidates = same_group_candidates if same_group_pref == voting_agreement['identical'] else list(np.random.permutation(same_group_candidates))
+    return interleave(cross_opposite_group_candidates, cross_same_group_candidates)

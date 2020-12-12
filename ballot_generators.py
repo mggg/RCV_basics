@@ -101,8 +101,7 @@ def paired_comparison_ballot_type(
     candidates_by_race,
     ballot_length,
     num_ballots,
-    fill_lengths=None
-):
+    fill_lengths=None):
     '''
     Custom function for effective sampling when preferred candidates are not
     distinguishable, two races
