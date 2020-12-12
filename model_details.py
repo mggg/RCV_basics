@@ -434,6 +434,7 @@ voting_agreement = {
 #######################################
 #######################################
 # Cambridge Sampler Specific variables
+# and functions
 #######################################
 
 # Load the ballot_type frequencies once into memory, used in the Cambridge model below
@@ -594,22 +595,18 @@ def Alternating_crossover_webapp(
     for n in range(num_simulations):
         ac_ballots = []
         # white bloc
-        a = int(num_ballots*white_share*white_support_for_white_candidates)
         ac_ballots.extend(
             [bloc_ballots(white_white_pref, white_candidates, white_poc_pref, poc_candidates)[:max_ballot_length] for x in range(num_white_bloc_voters)]
         )
         # white cross
-        a = int(num_ballots*white_share*white_support_for_poc_candidates)
         ac_ballots.extend(
             [cross_ballots(white_white_pref, white_candidates, white_poc_pref, poc_candidates)[:max_ballot_length] for x in range(num_white_cross_voters)]
         )
         # poc bloc
-        a = int(num_ballots*poc_share*poc_support_for_poc_candidates)
         ac_ballots.extend(
             [bloc_ballots(poc_poc_pref, poc_candidates, poc_white_pref, white_candidates)[:max_ballot_length] for x in range(num_poc_bloc_voters)]
         )
         # poc cross
-        a = int(num_ballots*poc_share*poc_support_for_white_candidates)
         ac_ballots.extend(
             [cross_ballots(poc_poc_pref, poc_candidates, poc_white_pref, white_candidates)[:max_ballot_length] for x in range(num_poc_cross_voters)]
         )
