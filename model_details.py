@@ -529,35 +529,34 @@ def Cambridge_ballot_type_webapp(
     for n in range(num_simulations):
         ballots = []
         # Pool for multiprocessing
-        pool = mp.Pool()
+        with mp.Pool() as pool:
+            # white voters white-candidate first on ballot
+            new_ballots = pool.starmap(
+                sample_ballots_for_voter_candidate_preference_group,
+                [(max_ballot_length, white_first_probs, white_voter_candidate_ordering) for x in range(num_white_white_voters)]
+            )
+            ballots.extend(new_ballots)
 
-        # white voters white-candidate first on ballot
-        new_ballots = pool.starmap(
-            sample_ballots_for_voter_candidate_preference_group,
-            [(max_ballot_length, white_first_probs, white_voter_candidate_ordering) for x in range(num_white_white_voters)]
-        )
-        ballots.extend(new_ballots)
+            # white voters poc first
+            new_ballots = pool.starmap(
+                sample_ballots_for_voter_candidate_preference_group,
+                [(max_ballot_length, poc_first_probs, white_voter_candidate_ordering) for x in range(num_white_poc_voters)]
+            )
+            ballots.extend(new_ballots)
 
-        # white voters poc first
-        new_ballots = pool.starmap(
-            sample_ballots_for_voter_candidate_preference_group,
-            [(max_ballot_length, poc_first_probs, white_voter_candidate_ordering) for x in range(num_white_poc_voters)]
-        )
-        ballots.extend(new_ballots)
+            # poc voters poc first
+            new_ballots = pool.starmap(
+                sample_ballots_for_voter_candidate_preference_group,
+                [(max_ballot_length, poc_first_probs, poc_voter_candidate_ordering) for x in range(num_poc_poc_voters)]
+            )
+            ballots.extend(new_ballots)
 
-        # poc voters poc first
-        new_ballots = pool.starmap(
-            sample_ballots_for_voter_candidate_preference_group,
-            [(max_ballot_length, poc_first_probs, poc_voter_candidate_ordering) for x in range(num_poc_poc_voters)]
-        )
-        ballots.extend(new_ballots)
-
-        # poc voters white first
-        new_ballots = pool.starmap(
-            sample_ballots_for_voter_candidate_preference_group,
-            [(max_ballot_length, white_first_probs, poc_voter_candidate_ordering) for x in range(num_poc_white_voters)]
-        )
-        ballots.extend(new_ballots)
+            # poc voters white first
+            new_ballots = pool.starmap(
+                sample_ballots_for_voter_candidate_preference_group,
+                [(max_ballot_length, white_first_probs, poc_voter_candidate_ordering) for x in range(num_poc_white_voters)]
+            )
+            ballots.extend(new_ballots)
 
         winners = cw.rcv_run(
             ballots.copy(),
