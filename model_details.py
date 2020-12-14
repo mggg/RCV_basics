@@ -1,6 +1,7 @@
 import pickle
 from numpy.random import choice
 from collections import defaultdict
+import multiprocessing as mp
 import compute_winners as cw
 import numpy as np
 from itertools import permutations, product
@@ -451,34 +452,31 @@ sum_poc_first_probs = sum(poc_first_probs.values())
 poc_first_probs = {x: p/sum_poc_first_probs for x, p in poc_first_probs.items()}
 
 
-def sample_ballots_for_voter_candidate_preference_group(n_ballots, max_ballot_length, pref_type_ballots_and_probs, voter_candidate_orderings):
+def sample_ballots_for_voter_candidate_preference_group(max_ballot_length, pref_type_ballots_and_probs, voter_candidate_orderings):
     '''
     For each (voter_type x candidate_type) preference group, generate n_ballots many ballots based on a randomly sampled
     Cambridge ballot and the available candidates for each race
     '''
-    sampled_ballots = []
-    for b in range(n_ballots):
-        selected_ballot = list(choice(
-            list(pref_type_ballots_and_probs.keys()),
-            p=list(pref_type_ballots_and_probs.values())
-        ))
-        trimmed_selected_ballot = selected_ballot[:max_ballot_length]
-        ballot_with_candidates = []
-        w_ind = 0
-        c_ind = 0
-        for candidate_type in trimmed_selected_ballot:
-            candidate_type_ordering = voter_candidate_orderings[candidate_type]
-            relevant_ind = w_ind if candidate_type == 'W' else c_ind
-            if (relevant_ind >= len(candidate_type_ordering)):
-                break
-            ballot_with_candidates.append(candidate_type_ordering[relevant_ind])
-            if candidate_type == 'W':
-                w_ind += 1
-            else:
-                c_ind += 1
+    selected_ballot = list(choice(
+        list(pref_type_ballots_and_probs.keys()),
+        p=list(pref_type_ballots_and_probs.values())
+    ))
+    trimmed_selected_ballot = selected_ballot[:max_ballot_length]
+    ballot_with_candidates = []
+    w_ind = 0
+    c_ind = 0
+    for candidate_type in trimmed_selected_ballot:
+        candidate_type_ordering = voter_candidate_orderings[candidate_type]
+        relevant_ind = w_ind if candidate_type == 'W' else c_ind
+        if (relevant_ind >= len(candidate_type_ordering)):
+            break
+        ballot_with_candidates.append(candidate_type_ordering[relevant_ind])
+        if candidate_type == 'W':
+            w_ind += 1
+        else:
+            c_ind += 1
 
-        sampled_ballots.append(ballot_with_candidates)
-    return sampled_ballots
+    return ballot_with_candidates
 
 
 def Cambridge_ballot_type_webapp(
@@ -500,29 +498,17 @@ def Cambridge_ballot_type_webapp(
     #       with the original version of this function, though an effort to synchronize them has been made.
     if max_ballot_length == None:
         max_ballot_length = num_poc_candidates+num_white_candidates
-    num_candidates = num_poc_candidates + num_white_candidates
+    # num_candidates = num_poc_candidates + num_white_candidates
     poc_elected_Cambridge = []
     white_share = 1 - poc_share
     white_white_pref, white_poc_pref, poc_poc_pref, poc_white_pref = voting_preferences
     poc_candidates = ['A'+str(x) for x in range(num_poc_candidates)]
     white_candidates = ['B'+str(x) for x in range(num_white_candidates)]
 
-    # consolidate to only prefixes that are valid based on number of candidates
-    # I.e.: shorten and aggregate all ballots that have too many candidate
-    # for white candidates
-    consolidated_probs = {}
-    for shortened_ballot in set([x[:num_candidates] for x in white_first_probs.keys()]):
-        consolidated_probs[shortened_ballot] = sum(
-            [white_first_probs[x] for x in white_first_probs if x[:num_candidates] == shortened_ballot]
-        )
-    consolidated_white_first_probs = consolidated_probs
-    # for poc candidates
-    consolidated_probs = {}
-    for shortened_ballot in set([x[:num_candidates] for x in poc_first_probs.keys()]):
-        consolidated_probs[shortened_ballot] = sum(
-            [poc_first_probs[x] for x in poc_first_probs if x[:num_candidates] == shortened_ballot]
-        )
-    consolidated_poc_first_probs = consolidated_probs
+    # NOTE: Removed previous consolidation approach. 1) it's buggy, and only takes into account total candidates,
+    #       not candidates per group; 2) Since `sample_ballots_for_voter_candidate_preference_group` short-circuits before
+    #       casting an invalid ballot, the consolidation is implicit in that function's mapping from preferences to candidates.
+    #       Ask Dylan for more details if desired
 
     # Split the total number of ballots along the support lines
     num_white_white_voters = int(num_ballots*(white_share)*white_support_for_white_candidates)
@@ -542,15 +528,36 @@ def Cambridge_ballot_type_webapp(
 
     for n in range(num_simulations):
         ballots = []
+        # Pool for multiprocessing
+        pool = mp.Pool()
 
         # white voters white-candidate first on ballot
-        ballots += sample_ballots_for_voter_candidate_preference_group(num_white_white_voters, max_ballot_length, consolidated_white_first_probs, white_voter_candidate_ordering)
+        new_ballots = pool.starmap(
+            sample_ballots_for_voter_candidate_preference_group,
+            [(max_ballot_length, white_first_probs, white_voter_candidate_ordering) for x in range(num_white_white_voters)]
+        )
+        ballots.extend(new_ballots)
+
         # white voters poc first
-        ballots += sample_ballots_for_voter_candidate_preference_group(num_white_poc_voters, max_ballot_length, consolidated_poc_first_probs, white_voter_candidate_ordering)
+        new_ballots = pool.starmap(
+            sample_ballots_for_voter_candidate_preference_group,
+            [(max_ballot_length, poc_first_probs, white_voter_candidate_ordering) for x in range(num_white_poc_voters)]
+        )
+        ballots.extend(new_ballots)
+
         # poc voters poc first
-        ballots += sample_ballots_for_voter_candidate_preference_group(num_poc_poc_voters, max_ballot_length, consolidated_poc_first_probs, poc_voter_candidate_ordering)
+        new_ballots = pool.starmap(
+            sample_ballots_for_voter_candidate_preference_group,
+            [(max_ballot_length, poc_first_probs, poc_voter_candidate_ordering) for x in range(num_poc_poc_voters)]
+        )
+        ballots.extend(new_ballots)
+
         # poc voters white first
-        ballots += sample_ballots_for_voter_candidate_preference_group(num_poc_white_voters, max_ballot_length, consolidated_white_first_probs, poc_voter_candidate_ordering)
+        new_ballots = pool.starmap(
+            sample_ballots_for_voter_candidate_preference_group,
+            [(max_ballot_length, white_first_probs, poc_voter_candidate_ordering) for x in range(num_poc_white_voters)]
+        )
+        ballots.extend(new_ballots)
 
         winners = cw.rcv_run(
             ballots.copy(),
