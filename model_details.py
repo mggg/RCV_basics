@@ -4,7 +4,6 @@ from collections import defaultdict
 import multiprocessing as mp
 import compute_winners as cw
 import numpy as np
-from itertools import permutations, product
 import random
 from vote_transfers import cincinnati_transfer
 from ballot_generators import paired_comparison_mcmc

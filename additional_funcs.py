@@ -5,10 +5,6 @@ Created on Thu Feb 20 15:28:46 2020
 @author: darac
 """
 
-import pandas as pd
-import numpy as np
-from numpy.random import choice
-
 
 def remove_cand(cand, ballot_list):
     for n, ballot in enumerate(ballot_list):

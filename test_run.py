@@ -10,13 +10,11 @@ candidates elected under each model and model choice.
 
 import sys
 import random
-from model_details import Cambridge_ballot_type, BABABA, luce_dirichlet, bradley_terry_dirichlet
-from vote_transfers import cincinnati_transfer
+import matplotlib
+import numpy as np
 import compute_winners as cw
 import matplotlib.pyplot as plt
-import numpy as np
-from itertools import product, permutations
-import matplotlib
+from model_details import Cambridge_ballot_type, BABABA, luce_dirichlet, bradley_terry_dirichlet
 matplotlib.use('Agg')
 
 

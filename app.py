@@ -1,10 +1,10 @@
 import os
-from flask import Flask, request
+from flask import Flask
 from flask_restful import Resource, Api, reqparse
-from resources.PlackettLuceDirichlet import PlackettLuceDirichlet
-from resources.BradleyTerryDirichlet import BradleyTerryDirichlet
-from resources.AlternatingCrossover import AlternatingCrossover
-from resources.CambridgeSampler import CambridgeSampler
+from api_resources.PlackettLuceDirichlet import PlackettLuceDirichlet
+from api_resources.BradleyTerryDirichlet import BradleyTerryDirichlet
+from api_resources.AlternatingCrossover import AlternatingCrossover
+from api_resources.CambridgeSampler import CambridgeSampler
 
 app = Flask(__name__)
 api = Api(app)
