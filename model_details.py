@@ -528,10 +528,10 @@ def Cambridge_ballot_type_webapp(
             [poc_first_probs[x] for x in poc_first_probs if x[:num_candidates] == pref]
         )
     poc_first_probs_truncated = truncated_probs
-    white_first_ballot_types = list(white_first_probs_truncated.keys())
-    white_first_ballot_probs = list(white_first_probs_truncated.values())
-    poc_first_ballot_types = list(poc_first_probs_truncated.keys())
-    poc_first_ballot_probs = list(poc_first_probs_truncated.values())
+    white_first_ballot_types_truncated = list(white_first_probs_truncated.keys())
+    white_first_ballot_probs_truncated = list(white_first_probs_truncated.values())
+    poc_first_ballot_types_truncated = list(poc_first_probs_truncated.keys())
+    poc_first_ballot_probs_truncated = list(poc_first_probs_truncated.values())
 
     # Split the total number of ballots along the support lines
     num_white_white_voters = int(num_ballots*(white_share)*white_support_for_white_candidates)
@@ -553,16 +553,40 @@ def Cambridge_ballot_type_webapp(
         ballots = []
 
         # white voters white-candidate first on ballot
-        new_ballots = sample_ballots_for_voter_candidate_preference_group(max_ballot_length, white_first_ballot_types, white_first_ballot_probs, white_voter_candidate_ordering, num_white_white_voters)
+        new_ballots = sample_ballots_for_voter_candidate_preference_group(
+            max_ballot_length,
+            white_first_ballot_types_truncated,
+            white_first_ballot_probs_truncated,
+            white_voter_candidate_ordering,
+            num_white_white_voters
+        )
         ballots.extend(new_ballots)
         # white voters poc first
-        new_ballots = sample_ballots_for_voter_candidate_preference_group(max_ballot_length, poc_first_ballot_types, poc_first_ballot_probs, white_voter_candidate_ordering, num_white_poc_voters)
+        new_ballots = sample_ballots_for_voter_candidate_preference_group(
+            max_ballot_length,
+            poc_first_ballot_types_truncated,
+            poc_first_ballot_probs_truncated,
+            white_voter_candidate_ordering,
+            num_white_poc_voters
+        )
         ballots.extend(new_ballots)
         # poc voters poc first
-        new_ballots = sample_ballots_for_voter_candidate_preference_group(max_ballot_length, poc_first_ballot_types, poc_first_ballot_probs, poc_voter_candidate_ordering, num_poc_poc_voters)
+        new_ballots = sample_ballots_for_voter_candidate_preference_group(
+            max_ballot_length,
+            poc_first_ballot_types_truncated,
+            poc_first_ballot_probs_truncated,
+            poc_voter_candidate_ordering,
+            num_poc_poc_voters
+        )
         ballots.extend(new_ballots)
         # poc voters white first
-        new_ballots = sample_ballots_for_voter_candidate_preference_group(max_ballot_length, white_first_ballot_types, white_first_ballot_probs, poc_voter_candidate_ordering, num_poc_white_voters)
+        new_ballots = sample_ballots_for_voter_candidate_preference_group(
+            max_ballot_length,
+            white_first_ballot_types_truncated,
+            white_first_ballot_probs_truncated,
+            poc_voter_candidate_ordering,
+            num_poc_white_voters
+        )
         ballots.extend(new_ballots)
 
         winners = cw.rcv_run(
