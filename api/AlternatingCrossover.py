@@ -1,7 +1,7 @@
 from flask_restful import Resource, reqparse
-from model_details import bradley_terry_dirichlet
-from common.default_arguments import addCommonArguments
-from common.default_transforms import (
+from model_details import Alternating_crossover_webapp
+from api.arguments.default_arguments import addCommonArguments
+from api.transforms.default_transforms import (
     poc_share_transform,
     poc_support_for_poc_candidates_transform,
     poc_support_for_white_candidates_transform,
@@ -13,22 +13,21 @@ from common.default_transforms import (
     num_poc_candidates_transform,
     num_simulations_transform,
 )
-from common.dirichlet_transforms import concentration_transform
+from api.transforms.ballot_type_transforms import ballot_type_transform
 
-# Arguments for the BradleyTerryDirichlet resource
+# Arguments for the AlternatingCrossover resource
 parser = reqparse.RequestParser()
 addCommonArguments(parser)
-parser.add_argument('majMajAffinity-bradleyTerry', dest="majMajAffinity", required=True, type=float)
-parser.add_argument('majMinAffinity-bradleyTerry', dest="majMinAffinity", required=True, type=float)
-parser.add_argument('minMinAffinity-bradleyTerry', dest="minMinAffinity", required=True, type=float)
-parser.add_argument('minMajAffinity-bradleyTerry', dest="minMajAffinity", required=True, type=float)
+parser.add_argument('majMajCandidateAgreement-alternatingCrossover', dest="majMajCandidateAgreement", required=True, type=float)
+parser.add_argument('majMinCandidateAgreement-alternatingCrossover', dest="majMinCandidateAgreement", required=True, type=float)
+parser.add_argument('minMinCandidateAgreement-alternatingCrossover', dest="minMinCandidateAgreement", required=True, type=float)
+parser.add_argument('minMajCandidateAgreement-alternatingCrossover', dest="minMajCandidateAgreement", required=True, type=float)
 
 
-
-class BradleyTerryDirichlet(Resource):
+class AlternatingCrossover(Resource):
     def get(self):
         args = parser.parse_args()
-        poc_elected_rcv, _ = bradley_terry_dirichlet(
+        poc_elected_rcv, _ = Alternating_crossover_webapp(
             poc_share=poc_share_transform(args),
             poc_support_for_poc_candidates=poc_support_for_poc_candidates_transform(args),
             poc_support_for_white_candidates=poc_support_for_white_candidates_transform(args),
@@ -38,7 +37,7 @@ class BradleyTerryDirichlet(Resource):
             seats_open=seats_open_transform(args),
             num_white_candidates=num_poc_candidates_transform(args),
             num_poc_candidates=num_white_candidates_transform(args),
-            concentrations=concentration_transform(args),
+            voting_preferences=ballot_type_transform(args),
             num_simulations=num_simulations_transform(args),
         )
         return dict({'poc_elected_rcv': poc_elected_rcv})

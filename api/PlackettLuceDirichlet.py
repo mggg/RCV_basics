@@ -1,7 +1,7 @@
 from flask_restful import Resource, reqparse
 from model_details import luce_dirichlet
-from common.default_arguments import addCommonArguments
-from common.default_transforms import (
+from api.arguments.default_arguments import addCommonArguments
+from api.transforms.default_transforms import (
     poc_share_transform,
     poc_support_for_poc_candidates_transform,
     poc_support_for_white_candidates_transform,
@@ -13,7 +13,7 @@ from common.default_transforms import (
     num_poc_candidates_transform,
     num_simulations_transform,
 )
-from common.dirichlet_transforms import concentration_transform
+from api.transforms.dirichlet_transforms import concentration_transform
 
 # Arguments for the plackettLuceDirichlet resource
 parser = reqparse.RequestParser()
@@ -22,7 +22,6 @@ parser.add_argument('majMajAffinity-plackettLuce', dest="majMajAffinity", requir
 parser.add_argument('majMinAffinity-plackettLuce', dest="majMinAffinity", required=True, type=float)
 parser.add_argument('minMinAffinity-plackettLuce', dest="minMinAffinity", required=True, type=float)
 parser.add_argument('minMajAffinity-plackettLuce', dest="minMajAffinity", required=True, type=float)
-
 
 
 class PlackettLuceDirichlet(Resource):

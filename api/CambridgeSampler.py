@@ -1,7 +1,7 @@
 from flask_restful import Resource, reqparse
 from model_details import Cambridge_ballot_type_webapp
-from common.default_arguments import addCommonArguments
-from common.default_transforms import (
+from api.arguments.default_arguments import addCommonArguments
+from api.transforms.default_transforms import (
     poc_share_transform,
     poc_support_for_poc_candidates_transform,
     poc_support_for_white_candidates_transform,
@@ -13,7 +13,7 @@ from common.default_transforms import (
     num_poc_candidates_transform,
     num_simulations_transform,
 )
-from common.ballot_type_transforms import ballot_type_transform
+from api.transforms.ballot_type_transforms import ballot_type_transform
 
 
 # Arguments for the CambridgeSampler resource
