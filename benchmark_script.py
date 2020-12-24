@@ -6,7 +6,7 @@ SETUP = 'from model_details import Cambridge_ballot_type_webapp'
 
 
 def benchmark_CS():
-    code_cs = 'Cambridge_ballot_type_webapp(num_simulations=5)'
+    code_cs = 'Cambridge_ballot_type_webapp(num_simulations=10)'
     num_runs = 10
     results = timeit.timeit(
         stmt=code_cs,
