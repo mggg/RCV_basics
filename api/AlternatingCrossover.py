@@ -18,10 +18,10 @@ from api.transforms.ballot_type_transforms import ballot_type_transform
 # Arguments for the AlternatingCrossover resource
 parser = reqparse.RequestParser()
 addCommonArguments(parser)
-parser.add_argument('majMajCandidateAgreement-alternatingCrossover', dest="majMajCandidateAgreement", required=True, type=float)
-parser.add_argument('majMinCandidateAgreement-alternatingCrossover', dest="majMinCandidateAgreement", required=True, type=float)
-parser.add_argument('minMinCandidateAgreement-alternatingCrossover', dest="minMinCandidateAgreement", required=True, type=float)
-parser.add_argument('minMajCandidateAgreement-alternatingCrossover', dest="minMajCandidateAgreement", required=True, type=float)
+parser.add_argument('majMajCandidateAgreement', dest="majMajCandidateAgreement", required=True, type=float)
+parser.add_argument('majMinCandidateAgreement', dest="majMinCandidateAgreement", required=True, type=float)
+parser.add_argument('minMinCandidateAgreement', dest="minMinCandidateAgreement", required=True, type=float)
+parser.add_argument('minMajCandidateAgreement', dest="minMajCandidateAgreement", required=True, type=float)
 
 
 class AlternatingCrossover(Resource):

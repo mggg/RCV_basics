@@ -18,10 +18,10 @@ from api.transforms.dirichlet_transforms import concentration_transform
 # Arguments for the BradleyTerryDirichlet resource
 parser = reqparse.RequestParser()
 addCommonArguments(parser)
-parser.add_argument('majMajAffinity-bradleyTerry', dest="majMajAffinity", required=True, type=float)
-parser.add_argument('majMinAffinity-bradleyTerry', dest="majMinAffinity", required=True, type=float)
-parser.add_argument('minMinAffinity-bradleyTerry', dest="minMinAffinity", required=True, type=float)
-parser.add_argument('minMajAffinity-bradleyTerry', dest="minMajAffinity", required=True, type=float)
+parser.add_argument('majMajAffinity', dest="majMajAffinity", required=True, type=float)
+parser.add_argument('majMinAffinity', dest="majMinAffinity", required=True, type=float)
+parser.add_argument('minMinAffinity', dest="minMinAffinity", required=True, type=float)
+parser.add_argument('minMajAffinity', dest="minMajAffinity", required=True, type=float)
 
 
 class BradleyTerryDirichlet(Resource):

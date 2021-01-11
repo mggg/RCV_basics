@@ -19,10 +19,10 @@ from api.transforms.ballot_type_transforms import ballot_type_transform
 # Arguments for the CambridgeSampler resource
 parser = reqparse.RequestParser()
 addCommonArguments(parser)
-parser.add_argument('majMajCandidateAgreement-cambridgeSampler', dest="majMajCandidateAgreement", required=True, type=float)
-parser.add_argument('majMinCandidateAgreement-cambridgeSampler', dest="majMinCandidateAgreement", required=True, type=float)
-parser.add_argument('minMinCandidateAgreement-cambridgeSampler', dest="minMinCandidateAgreement", required=True, type=float)
-parser.add_argument('minMajCandidateAgreement-cambridgeSampler', dest="minMajCandidateAgreement", required=True, type=float)
+parser.add_argument('majMajCandidateAgreement', dest="majMajCandidateAgreement", required=True, type=float)
+parser.add_argument('majMinCandidateAgreement', dest="majMinCandidateAgreement", required=True, type=float)
+parser.add_argument('minMinCandidateAgreement', dest="minMinCandidateAgreement", required=True, type=float)
+parser.add_argument('minMajCandidateAgreement', dest="minMajCandidateAgreement", required=True, type=float)
 
 
 class CambridgeSampler(Resource):

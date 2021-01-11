@@ -18,10 +18,10 @@ from api.transforms.dirichlet_transforms import concentration_transform
 # Arguments for the plackettLuceDirichlet resource
 parser = reqparse.RequestParser()
 addCommonArguments(parser)
-parser.add_argument('majMajAffinity-plackettLuce', dest="majMajAffinity", required=True, type=float)
-parser.add_argument('majMinAffinity-plackettLuce', dest="majMinAffinity", required=True, type=float)
-parser.add_argument('minMinAffinity-plackettLuce', dest="minMinAffinity", required=True, type=float)
-parser.add_argument('minMajAffinity-plackettLuce', dest="minMajAffinity", required=True, type=float)
+parser.add_argument('majMajAffinity', dest="majMajAffinity", required=True, type=float)
+parser.add_argument('majMinAffinity', dest="majMinAffinity", required=True, type=float)
+parser.add_argument('minMinAffinity', dest="minMinAffinity", required=True, type=float)
+parser.add_argument('minMajAffinity', dest="minMajAffinity", required=True, type=float)
 
 
 class PlackettLuceDirichlet(Resource):
