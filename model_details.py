@@ -196,20 +196,19 @@ def Cambridge_ballot_type(
 
 
 def BABABA(
-    poc_share=0.33,
-    poc_support_for_poc_candidates=0.7,
-    poc_support_for_white_candidates=0.3,
-    white_support_for_white_candidates=0.8,
-    white_support_for_poc_candidates=0.2,
-    num_ballots=1000,
-    num_simulations=100,
-    seats_open=3,
-    num_poc_candidates=2,
-    num_white_candidates=3,
-    scenarios_to_run=['A', 'B', 'C', 'D'],
-    max_ballot_length=None,
-    verbose=False
-):
+        poc_share=0.33,
+        poc_support_for_poc_candidates=0.7,
+        poc_support_for_white_candidates=0.3,
+        white_support_for_white_candidates=0.8,
+        white_support_for_poc_candidates=0.2,
+        num_ballots=1000,
+        num_simulations=100,
+        seats_open=3,
+        num_poc_candidates=2,
+        num_white_candidates=3,
+        scenarios_to_run=['A', 'B', 'C', 'D'],
+        max_ballot_length=None,
+        verbose=False):
     # Alternating Crossover Model
     if max_ballot_length == None:
         max_ballot_length = num_poc_candidates+num_white_candidates

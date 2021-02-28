@@ -159,14 +159,13 @@ def paired_comparison_ballot_type(
 
 
 def paired_comparison_predefined(
-    num_ballots,
-    paired_compare_dicts,
-    vote_portion_by_race,
-    seeds=None,
-    sample_interval=1,
-    verbose=False,
-    fill_lengths=None
-):
+        num_ballots,
+        paired_compare_dicts,
+        vote_portion_by_race,
+        seeds=None,
+        sample_interval=1,
+        verbose=False,
+        fill_lengths=None):
     if fill_lengths == None:
         fill_lengths = [
             len(set(x[0] for y in paired_compare_dicts.values() for x in y))

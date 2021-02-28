@@ -51,5 +51,4 @@ class PlackettLuceDirichlet(Resource):
             concentrations=concentration_transform(args),
             num_simulations=num_simulations_transform(args),
         )
-        print("poc_elected_rcv", poc_elected_rcv)
-        return dict({'poc_elected_rcv': poc_elected_rcv})
+        return dict({'poc_elected_rcv': poc_elected_rcv, 'seats_open': seats_open_transform(args)})

@@ -5,6 +5,10 @@ from additional_funcs import recompute_count
 
 
 def rcv_run(ballot_list, cand_list, num_seats, transfer_method, verbose_bool=False):
+    # Cornercase: If seats ≥ candidates, all are elected
+    if (num_seats >= len(cand_list)):
+        return cand_list
+
     winners = []
     cutoff = int(len(ballot_list)/(num_seats+1) + 1)
     candidates = cand_list.copy()
