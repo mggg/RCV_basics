@@ -5,6 +5,7 @@ from api.PlackettLuceDirichlet import PlackettLuceDirichlet
 from api.BradleyTerryDirichlet import BradleyTerryDirichlet
 from api.AlternatingCrossover import AlternatingCrossover
 from api.CambridgeSampler import CambridgeSampler
+from api.Ensemble import Ensemble
 
 app = Flask(__name__)
 app_api = Api(app)
@@ -27,6 +28,7 @@ app_api.add_resource(PlackettLuceDirichlet, '/' + os.path.join(API_BASE_URL, VER
 app_api.add_resource(BradleyTerryDirichlet, '/' + os.path.join(API_BASE_URL, VERSION, 'bradleyTerry'))
 app_api.add_resource(AlternatingCrossover, '/' + os.path.join(API_BASE_URL, VERSION, 'alternatingCrossover'))
 app_api.add_resource(CambridgeSampler, '/' + os.path.join(API_BASE_URL, VERSION, 'cambridgeSampler'))
+app_api.add_resource(Ensemble, '/' + os.path.join(API_BASE_URL, VERSION, 'ensemble'))
 
 if __name__ == '__main__':
     app.run(debug=True, port=PORT)

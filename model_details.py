@@ -494,9 +494,9 @@ def Cambridge_ballot_type_webapp(
         white_support_for_poc_candidates=0.2,
         num_ballots=1000,
         num_simulations=100,
-        seats_open=3,
-        num_poc_candidates=2,
-        num_white_candidates=3,
+        seats_open=4,
+        num_poc_candidates=4,
+        num_white_candidates=4,
         voting_preferences=[voting_agreement['identical'], voting_agreement['identical'], voting_agreement['identical'], voting_agreement['identical']],
         max_ballot_length=None,
         verbose=False):
