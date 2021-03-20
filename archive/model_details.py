@@ -548,7 +548,7 @@ def Cambridge_ballot_type_webapp(
         'C': list(reversed(poc_candidates) if poc_poc_pref == voting_agreement['identical'] else np.random.permutation(poc_candidates))
     }
 
-    for n in range(num_simulations):
+    while num_simulations > 0:
         ballots = []
 
         # white voters white-candidate first on ballot
@@ -595,6 +595,7 @@ def Cambridge_ballot_type_webapp(
             cincinnati_transfer,
         )
         poc_elected_Cambridge.append(len([x for x in winners if x[0] == 'A']))
+        num_simulations -= 1
 
     return poc_elected_Cambridge, None
 
@@ -628,7 +629,7 @@ def Alternating_crossover_webapp(
     num_white_cross_voters = int(num_ballots*(white_share)*white_support_for_poc_candidates)
     num_poc_bloc_voters = int(num_ballots*(poc_share)*poc_support_for_poc_candidates)
     num_poc_cross_voters = int(num_ballots*(poc_share)*poc_support_for_white_candidates)
-    for n in range(num_simulations):
+    while num_simulations > 0:
         ac_ballots = []
         # white bloc
         ac_ballots.extend(
@@ -653,6 +654,7 @@ def Alternating_crossover_webapp(
         # winners
         winners = cw.rcv_run(ac_ballots.copy(), white_candidates + poc_candidates, seats_open, cincinnati_transfer)
         poc_elected_ac.append(len([w for w in winners if w[0] == 'A']))
+        num_simulations -= 1
 
     return poc_elected_ac, None
 

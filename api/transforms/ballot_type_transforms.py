@@ -1,4 +1,4 @@
-from model_details import voting_agreement
+from models.helpers.VoterTypes import voting_agreement
 
 
 def ballot_type_transform(args):

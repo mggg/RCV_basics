@@ -1,7 +1,12 @@
 
 import random
-from ballot_generators import luce, luce_uncertainty, paired_comparison, paired_comparison_mcmc
-from additional_funcs import recompute_count
+
+
+def _recompute_count(candidates, ballot_list):
+    cand_totals = {}
+    for cand in candidates:
+        cand_totals[cand] = len([ballot for ballot in ballot_list if ballot[0] == cand])
+    return cand_totals
 
 
 def rcv_run(ballot_list, cand_list, num_seats, transfer_method, verbose_bool=False):
@@ -12,14 +17,14 @@ def rcv_run(ballot_list, cand_list, num_seats, transfer_method, verbose_bool=Fal
     winners = []
     cutoff = int(len(ballot_list)/(num_seats+1) + 1)
     candidates = cand_list.copy()
-    cand_totals = recompute_count(candidates, ballot_list)
+    cand_totals = _recompute_count(candidates, ballot_list)
 
     while len(winners) < num_seats:
         remaining_cands = candidates
         if len(remaining_cands) == num_seats - len(winners):
             winners = winners + remaining_cands
             break
-        cand_totals = recompute_count(candidates, ballot_list)
+        cand_totals = _recompute_count(candidates, ballot_list)
 
         for cand in list(candidates):
             if len(winners) == num_seats:
@@ -29,7 +34,7 @@ def rcv_run(ballot_list, cand_list, num_seats, transfer_method, verbose_bool=Fal
                 transfer_method(cand, ballot_list, "win", cutoff)
                 candidates.remove(cand)
                 ballot_list = [x for x in ballot_list if x != []]
-                cand_totals = recompute_count(candidates, ballot_list)
+                cand_totals = _recompute_count(candidates, ballot_list)
                 if verbose_bool:
                     print("candidate", cand, "elected")
 
@@ -43,7 +48,7 @@ def rcv_run(ballot_list, cand_list, num_seats, transfer_method, verbose_bool=Fal
         transfer_method(min_cand, ballot_list, "lose", cutoff)
         candidates.remove(min_cand)
         ballot_list = [x for x in ballot_list if x != []]
-        cand_totals = recompute_count(candidates, ballot_list)
+        cand_totals = _recompute_count(candidates, ballot_list)
         if verbose_bool:
             print("candidate", min_cand, "eliminated")
     return winners

@@ -12,9 +12,8 @@ import sys
 import random
 import matplotlib
 import numpy as np
-import compute_winners as cw
 import matplotlib.pyplot as plt
-from model_details import Cambridge_ballot_type, BABABA, luce_dirichlet, bradley_terry_dirichlet
+from models import old_BABABA, old_Cambridge_ballot_type, plackett_luce_dirichlet, bradley_terry_dirichlet
 matplotlib.use('Agg')
 
 
@@ -46,11 +45,11 @@ concentration_list = [[0.5]*4, [2, 0.5, 0.5, 0.5], [2, 2, 2, 2], [2, 2, 0.5, 0.5
 
 
 # simulate
-poc_elected_luce_dirichlet = []
-poc_elected_luce_dirichlet_atlarge = []
+poc_elected_plackett_luce_dirichlet = []
+poc_elected_plackett_luce_dirichlet_atlarge = []
 for i, concentrations in enumerate(concentration_list):
     print(concentrations)
-    poc_elected_rcv, poc_elected_atlarge = luce_dirichlet(
+    poc_elected_rcv, poc_elected_atlarge = plackett_luce_dirichlet(
         poc_share=poc_share,
         poc_support_for_poc_candidates=poc_support_for_poc_candidates,
         poc_support_for_white_candidates=poc_support_for_white_candidates,
@@ -63,15 +62,15 @@ for i, concentrations in enumerate(concentration_list):
         num_white_candidates=num_white_candidates,
         concentrations=concentrations
     )
-    poc_elected_luce_dirichlet.append(poc_elected_rcv)
-    poc_elected_luce_dirichlet_atlarge.append(poc_elected_atlarge)
+    poc_elected_plackett_luce_dirichlet.append(poc_elected_rcv)
+    poc_elected_plackett_luce_dirichlet_atlarge.append(poc_elected_atlarge)
     print("\n")
 
 
-print("\n Plackett-Luce Dirichelet predictions in order:")
+print("\n Plackett-Luce Dirichlet predictions in order:")
 for i, c in enumerate(concentration_list[:-1]):
-    print("{:.1f} ({:.1f}) &".format(np.mean(poc_elected_luce_dirichlet[i]), np.mean(poc_elected_luce_dirichlet_atlarge[i])), end=" ")
-print(np.mean(poc_elected_luce_dirichlet[-1]))
+    print("{:.1f} ({:.1f}) &".format(np.mean(poc_elected_plackett_luce_dirichlet[i]), np.mean(poc_elected_plackett_luce_dirichlet_atlarge[i])), end=" ")
+print(np.mean(poc_elected_plackett_luce_dirichlet[-1]))
 
 # Bradley-Terry (Dirichlet variation)
 concentrations = [0.5]*4  # >>1 means very similar supports, <<1 means most support goes to one or two candidates
@@ -110,7 +109,7 @@ print("{:.1f} ({:.1f})".format(np.mean(poc_elected_bradley_terry_dirichlet[-1]),
 # Alternating crossover model
 
 # simulate
-poc_elected_bababa,  poc_elected_bababa_atlarge = BABABA(
+poc_elected_bababa,  poc_elected_bababa_atlarge = old_BABABA(
     poc_share=poc_share,
     poc_support_for_poc_candidates=poc_support_for_poc_candidates,
     poc_support_for_white_candidates=poc_support_for_white_candidates,
@@ -136,7 +135,7 @@ print("{:.1f} ({:.1f})".format(
 # Cambridge ballot types
 
 # simulate
-poc_elected_Cambridge, poc_elected_Cambridge_atlarge = Cambridge_ballot_type(
+poc_elected_Cambridge, poc_elected_Cambridge_atlarge = old_Cambridge_ballot_type(
     poc_share=poc_share,
     poc_support_for_poc_candidates=poc_support_for_poc_candidates,
     poc_support_for_white_candidates=poc_support_for_white_candidates,

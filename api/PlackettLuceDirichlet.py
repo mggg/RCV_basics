@@ -1,5 +1,5 @@
 from flask_restful import Resource, reqparse
-from model_details import luce_dirichlet
+from models import plackett_luce_dirichlet
 from api.arguments.default_arguments import addCommonArguments
 from api.transforms.default_transforms import (
     poc_share_transform,
@@ -38,7 +38,7 @@ class PlackettLuceDirichlet(Resource):
         # print("num_poc_candidates: ", num_white_candidates_transform(args))
         # print("concentrations: ", concentration_transform(args))
         # print("num_simulations: ", num_simulations_transform(args))
-        poc_elected_rcv, _ = luce_dirichlet(
+        poc_elected_rcv, _ = plackett_luce_dirichlet(
             poc_share=poc_share_transform(args),
             poc_support_for_poc_candidates=poc_support_for_poc_candidates_transform(args),
             poc_support_for_white_candidates=poc_support_for_white_candidates_transform(args),

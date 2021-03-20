@@ -1,5 +1,5 @@
 from flask_restful import Resource, reqparse
-from model_details import Cambridge_ballot_type_webapp
+from models import Cambridge_ballot_type_webapp
 from api.arguments.default_arguments import addCommonArguments
 from api.transforms.default_transforms import (
     poc_share_transform,

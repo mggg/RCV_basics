@@ -1,5 +1,5 @@
 from flask_restful import Resource, reqparse
-from model_details import Alternating_crossover_webapp, bradley_terry_dirichlet, luce_dirichlet, Cambridge_ballot_type_webapp
+from models import Alternating_crossover_webapp, bradley_terry_dirichlet, plackett_luce_dirichlet, Cambridge_ballot_type_webapp
 from api.arguments.default_arguments import addCommonArguments
 from api.transforms.default_transforms import (
     poc_share_transform,
@@ -47,7 +47,7 @@ class Ensemble(Resource):
             num_poc_candidates=num_white_candidates_transform(args),
             num_simulations=num_simulations_transform(args),
         )
-        pl_poc_elected_rcv, _ = luce_dirichlet(
+        pl_poc_elected_rcv, _ = plackett_luce_dirichlet(
             poc_share=poc_share_transform(args),
             poc_support_for_poc_candidates=poc_support_for_poc_candidates_transform(args),
             poc_support_for_white_candidates=poc_support_for_white_candidates_transform(args),

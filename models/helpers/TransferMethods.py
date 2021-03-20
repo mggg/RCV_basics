@@ -1,16 +1,18 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Feb 20 15:28:28 2020
-
-@author: darac
-"""
 import random
-from additional_funcs import remove_cand
+
+
+def _remove_cand(cand, ballot_list):
+    for n, ballot in enumerate(ballot_list):
+        new_ballot = []
+        for c in ballot:
+            if c != cand:
+                new_ballot.append(c)
+        ballot_list[n] = new_ballot
 
 
 def cincinnati_transfer(cand, ballot_list, win_lose, cutoff):
     if win_lose == 'lose':
-        remove_cand(cand, ballot_list)
+        _remove_cand(cand, ballot_list)
     else:
         cand_ballots_index = []
         single_cand_ballots_index = []
@@ -29,4 +31,4 @@ def cincinnati_transfer(cand, ballot_list, win_lose, cutoff):
             del ballot_list[index]
 
         # remove candidate from rest of ballots
-        remove_cand(cand, ballot_list)
+        _remove_cand(cand, ballot_list)

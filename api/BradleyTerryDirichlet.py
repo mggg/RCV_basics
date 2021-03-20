@@ -1,5 +1,5 @@
 from flask_restful import Resource, reqparse
-from model_details import bradley_terry_dirichlet
+from models import bradley_terry_dirichlet
 from api.arguments.default_arguments import addCommonArguments
 from api.transforms.default_transforms import (
     poc_share_transform,
