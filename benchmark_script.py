@@ -79,8 +79,15 @@ def benchmark(model_type, num_runs=10):
     print(results)
 
 
+def main():
+    # Four different model_types:
+    # 'BT', 'PL, 'CS', 'AC'
+
+    benchmark('PL', 20)
+    # benchmark('BT', 20)
+    # benchmark('CS', 20)
+    # benchmark('AC', 20)
+
+
 if __name__ == "__main__":
-    benchmark('BT', 5)
-    # benchmark('PL', 5)
-    # benchmark('CS')
-    # benchmark('AC')
+    main()
