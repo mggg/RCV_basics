@@ -34,7 +34,7 @@ def model_code(model_type):
         voting_preferences=[1, 1, 1, 1],
         num_simulations=10)'''
     elif model_type == 'PL':
-        code = '''luce_dirichlet(poc_share=0.42000000000000004,
+        code = '''plackett_luce_dirichlet(poc_share=0.42000000000000004,
             poc_support_for_poc_candidates=0.96,
             poc_support_for_white_candidates=0.040000000000000036,
             white_support_for_white_candidates=0.67,
@@ -62,26 +62,25 @@ def model_code(model_type):
     return code
 
 
-def benchmark(model_type):
+def benchmark(model_type, num_runs=10):
     code = model_code(model_type)
-    num_runs = 10
     results = timeit.timeit(
         stmt=code,
         setup=SETUP,
         number=num_runs
     )
     print(f'''
-    {model_type} model_type Benchmarking Results
-    ======================================
-    | Time total        | {results:13f} |
-    | Number of runs    | {num_runs:13d} |
-    | Time per run      | {results/num_runs:13f} |
+## {model_type} model_type Benchmarking Results
+
+| Time total    | Number of runs | Time per run  |
+| :------------ | :------------- | :------------ |
+| {results:13f} | {num_runs:14d} | {results/num_runs:13f} |
     ''')
     print(results)
 
 
 if __name__ == "__main__":
-    benchmark('BT')
-    benchmark('PL')
-    benchmark('CS')
-    benchmark('AC')
+    benchmark('BT', 5)
+    # benchmark('PL', 5)
+    # benchmark('CS')
+    # benchmark('AC')

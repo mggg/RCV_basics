@@ -261,6 +261,15 @@ def paired_comparison(num_ballots,
     return ballots_list
 
 
+# function for evaluating single ballot in MCMC
+# don't need normalization term here! Exact probability of a particular ballot would be
+# output of this fnction divided by normalization term that MCMC allows us to avoid
+def _mcmc_ballot_prob(ballot, paired_compare_dict):
+    pairs_list_ballot = list(itertools.combinations(ballot, 2))
+    ballot_prob = np.product([paired_compare_dict[k] for k in pairs_list_ballot])
+    return ballot_prob
+
+
 def paired_comparison_mcmc(num_ballots,
                            mean_support_by_race,
                            std_support_by_race,
@@ -282,16 +291,6 @@ def paired_comparison_mcmc(num_ballots,
         paired_compare_dict = {k: mean_support_by_race[race][k[0]]/(mean_support_by_race[race][k[0]]+mean_support_by_race[race][k[1]]) for k in ordered_cand_pairs}
         # starting ballot for mcmc
         start_ballot = list(np.random.permutation(cand_list))
-        # function for evaluating single ballot in MCMC
-        # don't need normalization term here! Exact probability of a particular ballot would be
-        # output of this fnction divided by normalization term that MCMC allows us to avoid
-        track_ballot_prob = []
-
-        def ballot_prob(ballot):
-            pairs_list_ballot = list(itertools.combinations(ballot, 2))
-            paired_compare_trunc = {k: paired_compare_dict[k] for k in pairs_list_ballot}
-            ballot_prob = np.product(list(paired_compare_trunc.values()))
-            return ballot_prob
 
         # start MCMC with 'start_ballot'
         num_ballots_race = int(num_ballots*vote_portion_by_race[race])
@@ -305,7 +304,7 @@ def paired_comparison_mcmc(num_ballots,
             proposed_ballot[j1], proposed_ballot[j2] = proposed_ballot[j2], proposed_ballot[j1]
 
             # acceptance ratio: (note - symmetric proposal function!)
-            accept_ratio = min(ballot_prob(proposed_ballot)/ballot_prob(start_ballot), 1)
+            accept_ratio = min(_mcmc_ballot_prob(proposed_ballot, paired_compare_dict)/_mcmc_ballot_prob(start_ballot, paired_compare_dict), 1)
             # accept or reject proposal
             if random.random() < accept_ratio:
                 start_ballot = proposed_ballot

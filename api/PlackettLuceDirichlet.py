@@ -27,17 +27,6 @@ parser.add_argument('minMajAffinity', dest="minMajAffinity", required=True, type
 class PlackettLuceDirichlet(Resource):
     def get(self):
         args = parser.parse_args()
-        # print("poc_share: ", poc_share_transform(args))
-        # print("poc_support_for_poc_candidates: ", poc_support_for_poc_candidates_transform(args))
-        # print("poc_support_for_white_candidates: ", poc_support_for_white_candidates_transform(args))
-        # print("white_support_for_white_candidates: ", white_support_for_white_candidates_transform(args))
-        # print("white_support_for_poc_candidates: ", white_support_for_poc_candidates_transform(args))
-        # print("num_ballots: ", num_ballots_transform(args))
-        # print("seats_open: ", seats_open_transform(args))
-        # print("num_white_candidates: ", num_poc_candidates_transform(args))
-        # print("num_poc_candidates: ", num_white_candidates_transform(args))
-        # print("concentrations: ", concentration_transform(args))
-        # print("num_simulations: ", num_simulations_transform(args))
         poc_elected_rcv, _ = plackett_luce_dirichlet(
             poc_share=poc_share_transform(args),
             poc_support_for_poc_candidates=poc_support_for_poc_candidates_transform(args),

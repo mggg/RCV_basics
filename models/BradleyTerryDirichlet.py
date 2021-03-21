@@ -3,7 +3,6 @@ from .helpers.BallotGenerators import paired_comparison_mcmc
 from .helpers.TransferMethods import cincinnati_transfer
 from .helpers.ElectionSimulations import rcv_run
 
-
 def bradley_terry_dirichlet(
         poc_share=0.33,
         poc_support_for_poc_candidates=0.7,

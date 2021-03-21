@@ -35,7 +35,7 @@ def plackett_luce_dirichlet(
 
     # simulate
     poc_elected_luce = []
-    for n in range(num_simulations):
+    while num_simulations > 0:
         # get support vectors
         noise_poc_voters = list(np.random.dirichlet([alphas[0]]*num_poc_candidates))+list(np.random.dirichlet([alphas[1]]*num_white_candidates))
         noise_white_voters = list(np.random.dirichlet([alphas[2]]*num_poc_candidates))+list(np.random.dirichlet([alphas[3]]*num_white_candidates))
@@ -54,19 +54,21 @@ def plackett_luce_dirichlet(
         ballots = []
         numballots = num_ballots
         _sum_to_one([white_voter_support_vector, poc_voter_support_vector])
+        possible_candidate_races = list(race_of_candidate.keys())
         # white
         for i in range(int(numballots*(1-poc_share))):
             ballots.append(
-                np.random.choice(list(race_of_candidate.keys()), size=len(race_of_candidate), p=white_voter_support_vector, replace=False)
+                np.random.choice(possible_candidate_races, size=len(race_of_candidate), p=white_voter_support_vector, replace=False)
             )
         # poc
         for i in range(int(numballots*poc_share)):
             ballots.append(
-                np.random.choice(list(race_of_candidate.keys()), size=len(race_of_candidate), p=poc_voter_support_vector, replace=False)
+                np.random.choice(possible_candidate_races, size=len(race_of_candidate), p=poc_voter_support_vector, replace=False)
             )
         # winners
         ballots = [b[:max_ballot_length] for b in ballots]
         winners = rcv_run(ballots.copy(), candidates, seats_open, cincinnati_transfer)
         poc_elected_luce.append(len([w for w in winners if w[0] == 'A']))
+        num_simulations -= 1
 
     return poc_elected_luce, None
