@@ -35,7 +35,7 @@ def run_simulation_by_type(args, model_type):
             seats_open=seats_open_transform(args),
             num_white_candidates=num_poc_candidates_transform(args),
             num_poc_candidates=num_white_candidates_transform(args),
-            num_simulations=num_simulations_transform(args),
+            num_simulations=1
         )
     if model_type == 'bt':
         poc_elected_rcv, _ = bradley_terry_dirichlet(
@@ -48,7 +48,7 @@ def run_simulation_by_type(args, model_type):
             seats_open=seats_open_transform(args),
             num_white_candidates=num_poc_candidates_transform(args),
             num_poc_candidates=num_white_candidates_transform(args),
-            num_simulations=num_simulations_transform(args),
+            num_simulations=1
         )
     if model_type == 'pl':
         poc_elected_rcv, _ = plackett_luce_dirichlet(
@@ -61,7 +61,7 @@ def run_simulation_by_type(args, model_type):
             seats_open=seats_open_transform(args),
             num_white_candidates=num_poc_candidates_transform(args),
             num_poc_candidates=num_white_candidates_transform(args),
-            num_simulations=num_simulations_transform(args),
+            num_simulations=1
         )
     if model_type == 'cs':
         poc_elected_rcv, _ = Cambridge_ballot_type_webapp(
@@ -74,7 +74,7 @@ def run_simulation_by_type(args, model_type):
             seats_open=seats_open_transform(args),
             num_white_candidates=num_poc_candidates_transform(args),
             num_poc_candidates=num_white_candidates_transform(args),
-            num_simulations=num_simulations_transform(args),
+            num_simulations=1
         )
     return poc_elected_rcv
 
@@ -85,7 +85,6 @@ class Ensemble(Resource):
         # For each simulation, iterate over the possible model types to get a close-to-even distribution of each type
         models = models_to_simulate_transform(args)
         num_simulations = num_simulations_transform(args)
-        print("num_simulations", num_simulations)
         ac_poc_elected_rcv, bt_poc_elected_rcv, pl_poc_elected_rcv, cs_poc_elected_rcv = [], [], [], []
         if len(models) == 0:
             return {}
