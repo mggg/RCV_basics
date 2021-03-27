@@ -8,4 +8,6 @@ def concentration_transform(args):
         args['majMinAffinity'],
         args['majMajAffinity'],
     ]
-    return [ 2 ** exp for exp in concentration_exps]
+    # Expected range of incoming values: [-1, -0.5, 0, 0.5, 1]
+    # Maps to: [1/2, ..., 2]
+    return [2 ** exp for exp in concentration_exps]

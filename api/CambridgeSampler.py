@@ -1,6 +1,7 @@
 from flask_restful import Resource, reqparse
 from models import Cambridge_ballot_type_webapp
-from api.arguments.default_arguments import addCommonArguments
+from api.arguments.default_arguments import add_default_arguments
+from api.arguments.fixed_ballot_type_arguments import add_fixed_ballot_type_arguments
 from api.transforms.default_transforms import (
     poc_share_transform,
     poc_support_for_poc_candidates_transform,
@@ -13,16 +14,13 @@ from api.transforms.default_transforms import (
     num_poc_candidates_transform,
     num_simulations_transform,
 )
-from api.transforms.ballot_type_transforms import ballot_type_transform
+from api.transforms.fixed_ballot_type_transforms import fixed_ballot_type_transform
 
 
 # Arguments for the CambridgeSampler resource
 parser = reqparse.RequestParser()
-addCommonArguments(parser)
-parser.add_argument('majMajCandidateAgreement', dest="majMajCandidateAgreement", required=True, type=float)
-parser.add_argument('majMinCandidateAgreement', dest="majMinCandidateAgreement", required=True, type=float)
-parser.add_argument('minMinCandidateAgreement', dest="minMinCandidateAgreement", required=True, type=float)
-parser.add_argument('minMajCandidateAgreement', dest="minMajCandidateAgreement", required=True, type=float)
+add_default_arguments(parser)
+add_fixed_ballot_type_arguments(parser)
 
 
 class CambridgeSampler(Resource):
@@ -38,7 +36,7 @@ class CambridgeSampler(Resource):
             seats_open=seats_open_transform(args),
             num_white_candidates=num_poc_candidates_transform(args),
             num_poc_candidates=num_white_candidates_transform(args),
-            voting_preferences=ballot_type_transform(args),
+            voting_preferences=fixed_ballot_type_transform(args),
             num_simulations=num_simulations_transform(args),
         )
         return dict({'poc_elected_rcv': poc_elected_rcv, 'seats_open': seats_open_transform(args)})

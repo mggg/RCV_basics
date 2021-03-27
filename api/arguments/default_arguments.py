@@ -1,5 +1,5 @@
 # Common arguments used across all resource endpoints
-def addCommonArguments(parser):
+def add_default_arguments(parser):
     parser.add_argument('ballots', required=True, type=int)
     parser.add_argument('seatsOpen', type=int, required=True)
     parser.add_argument('majCandidates', required=True, type=int)

@@ -1,6 +1,7 @@
 from flask_restful import Resource, reqparse
 from models import Alternating_crossover_webapp, bradley_terry_dirichlet, plackett_luce_dirichlet, Cambridge_ballot_type_webapp
-from api.arguments.default_arguments import addCommonArguments
+from api.arguments.default_arguments import add_default_arguments
+from api.arguments.ensemble_arguments import add_ensemble_arguments
 from api.transforms.default_transforms import (
     poc_share_transform,
     poc_support_for_poc_candidates_transform,
@@ -13,13 +14,16 @@ from api.transforms.default_transforms import (
     num_poc_candidates_transform,
     num_simulations_transform,
 )
-from api.transforms.ensemble_transforms import models_to_simulate_transform
-from api.transforms.ballot_type_transforms import ballot_type_transform
+from api.transforms.ensemble_transforms import (
+    models_to_simulate_transform,
+    fixed_ballot_type_transform,
+    concentration_transform,
+)
 
 # Arguments for the Ensemble resource
 parser = reqparse.RequestParser()
-addCommonArguments(parser)
-parser.add_argument('modelsToSimulate', dest="modelsToSimulate", required=True, type=int, action='append')
+add_default_arguments(parser)
+add_ensemble_arguments(parser)
 
 
 def run_simulation_by_type(args, model_type):
@@ -35,6 +39,7 @@ def run_simulation_by_type(args, model_type):
             seats_open=seats_open_transform(args),
             num_white_candidates=num_poc_candidates_transform(args),
             num_poc_candidates=num_white_candidates_transform(args),
+            voting_preferences=fixed_ballot_type_transform(args),
             num_simulations=1
         )
     if model_type == 'bt':
@@ -48,6 +53,7 @@ def run_simulation_by_type(args, model_type):
             seats_open=seats_open_transform(args),
             num_white_candidates=num_poc_candidates_transform(args),
             num_poc_candidates=num_white_candidates_transform(args),
+            concentrations=concentration_transform(args),
             num_simulations=1
         )
     if model_type == 'pl':
@@ -61,6 +67,7 @@ def run_simulation_by_type(args, model_type):
             seats_open=seats_open_transform(args),
             num_white_candidates=num_poc_candidates_transform(args),
             num_poc_candidates=num_white_candidates_transform(args),
+            concentrations=concentration_transform(args),
             num_simulations=1
         )
     if model_type == 'cs':
@@ -74,6 +81,7 @@ def run_simulation_by_type(args, model_type):
             seats_open=seats_open_transform(args),
             num_white_candidates=num_poc_candidates_transform(args),
             num_poc_candidates=num_white_candidates_transform(args),
+            voting_preferences=fixed_ballot_type_transform(args),
             num_simulations=1
         )
     return poc_elected_rcv
@@ -82,7 +90,7 @@ def run_simulation_by_type(args, model_type):
 class Ensemble(Resource):
     def get(self):
         args = parser.parse_args()
-        # For each simulation, iterate over the possible model types to get a close-to-even distribution of each type
+        # For each simulation, iterate over the possible model types to get a close-to-even distribution of each model_type
         models = models_to_simulate_transform(args)
         num_simulations = num_simulations_transform(args)
         ac_poc_elected_rcv, bt_poc_elected_rcv, pl_poc_elected_rcv, cs_poc_elected_rcv = [], [], [], []
