@@ -40,7 +40,7 @@ def run_simulation_by_type(args, model_type):
             num_white_candidates=num_poc_candidates_transform(args),
             num_poc_candidates=num_white_candidates_transform(args),
             voting_preferences=fixed_ballot_type_transform(args),
-            num_simulations=1
+            num_simulations=num_simulations_transform(args)
         )
     if model_type == 'bt':
         poc_elected_rcv, _ = bradley_terry_dirichlet(
@@ -54,7 +54,7 @@ def run_simulation_by_type(args, model_type):
             num_white_candidates=num_poc_candidates_transform(args),
             num_poc_candidates=num_white_candidates_transform(args),
             concentrations=concentration_transform(args),
-            num_simulations=1
+            num_simulations=num_simulations_transform(args)
         )
     if model_type == 'pl':
         poc_elected_rcv, _ = plackett_luce_dirichlet(
@@ -68,7 +68,7 @@ def run_simulation_by_type(args, model_type):
             num_white_candidates=num_poc_candidates_transform(args),
             num_poc_candidates=num_white_candidates_transform(args),
             concentrations=concentration_transform(args),
-            num_simulations=1
+            num_simulations=num_simulations_transform(args)
         )
     if model_type == 'cs':
         poc_elected_rcv, _ = Cambridge_ballot_type_webapp(
@@ -82,7 +82,7 @@ def run_simulation_by_type(args, model_type):
             num_white_candidates=num_poc_candidates_transform(args),
             num_poc_candidates=num_white_candidates_transform(args),
             voting_preferences=fixed_ballot_type_transform(args),
-            num_simulations=1
+            num_simulations=num_simulations_transform(args)
         )
     return poc_elected_rcv
 
@@ -92,12 +92,11 @@ class Ensemble(Resource):
         args = parser.parse_args()
         # For each simulation, iterate over the possible model types to get a close-to-even distribution of each model_type
         models = models_to_simulate_transform(args)
-        num_simulations = num_simulations_transform(args)
         ac_poc_elected_rcv, bt_poc_elected_rcv, pl_poc_elected_rcv, cs_poc_elected_rcv = [], [], [], []
         if len(models) == 0:
             return {}
         num_possible_models = len(models)
-        for i in range(num_simulations):
+        for i in range(num_possible_models):
             model_type = models[i % num_possible_models]
             poc_elected = run_simulation_by_type(args, model_type)
             if model_type == 'ac':
