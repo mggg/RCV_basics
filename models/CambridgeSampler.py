@@ -25,11 +25,27 @@ poc_first_ballot_types = list(poc_first_probs.keys())
 poc_first_ballot_probs = list(poc_first_probs.values())
 
 
-def _sample_ballots_for_voter_candidate_preference_group(max_ballot_length, pref_type_ballots, pref_type_probs, voter_candidate_orderings, num_samples):
+def _sample_ballots_for_voter_candidate_preference_group(max_ballot_length, pref_type_ballots, pref_type_probs, voter_candidate_orderings, num_samples, white_candidates, poc_candidates, voting_preferences):
     '''
     For each (voter_type x candidate_type) preference group, generate n_ballots many ballots based on a randomly sampled
     Cambridge ballot and the available candidates for each race
     '''
+    candidate_orderings = {}
+    white_white_pref, white_poc_pref, poc_poc_pref, poc_white_pref = voting_preferences
+
+    if voter_candidate_orderings == 'white_voter_candidate_ordering':
+        # define candidate preferences across voting groups
+        candidate_orderings = {
+            'W': list(reversed(white_candidates) if white_white_pref == voting_agreement['identical'] else np.random.permutation(white_candidates)),
+            'C': list(reversed(poc_candidates) if white_poc_pref == voting_agreement['identical'] else np.random.permutation(poc_candidates))
+        }
+    elif voter_candidate_orderings == 'poc_voter_candidate_ordering':
+        candidate_orderings = {
+            'W': list(reversed(white_candidates) if poc_white_pref == voting_agreement['identical'] else np.random.permutation(white_candidates)),
+            'C': list(reversed(poc_candidates) if poc_poc_pref == voting_agreement['identical'] else np.random.permutation(poc_candidates))
+        }
+    else:
+        print('Cambridge Sampler, unrecognized voter candidate ordering: ', voter_candidate_orderings)
 
     selected_ballots = np.random.choice(
         pref_type_ballots,
@@ -44,7 +60,7 @@ def _sample_ballots_for_voter_candidate_preference_group(max_ballot_length, pref
         w_ind = 0
         c_ind = 0
         for candidate_type in trimmed_selected_ballot:
-            candidate_type_ordering = voter_candidate_orderings[candidate_type]
+            candidate_type_ordering = candidate_orderings[candidate_type]
             relevant_ind = w_ind if candidate_type == 'W' else c_ind
             if (relevant_ind >= len(candidate_type_ordering)):
                 break
@@ -80,7 +96,6 @@ def Cambridge_ballot_type_webapp(
         max_ballot_length = num_poc_candidates+num_white_candidates
     poc_elected_Cambridge = []
     white_share = 1 - poc_share
-    white_white_pref, white_poc_pref, poc_poc_pref, poc_white_pref = voting_preferences
     poc_candidates = ['A'+str(x) for x in range(num_poc_candidates)]
     white_candidates = ['B'+str(x) for x in range(num_white_candidates)]
 
@@ -111,16 +126,6 @@ def Cambridge_ballot_type_webapp(
     num_poc_poc_voters = int(num_ballots*(poc_share)*poc_support_for_poc_candidates)
     num_poc_white_voters = int(num_ballots*(poc_share)*poc_support_for_white_candidates)
 
-    # define candidate preferences across voting groups
-    white_voter_candidate_ordering = {
-        'W': list(reversed(white_candidates) if white_white_pref == voting_agreement['identical'] else np.random.permutation(white_candidates)),
-        'C': list(reversed(poc_candidates) if white_poc_pref == voting_agreement['identical'] else np.random.permutation(poc_candidates))
-    }
-    poc_voter_candidate_ordering = {
-        'W': list(reversed(white_candidates) if poc_white_pref == voting_agreement['identical'] else np.random.permutation(white_candidates)),
-        'C': list(reversed(poc_candidates) if poc_poc_pref == voting_agreement['identical'] else np.random.permutation(poc_candidates))
-    }
-
     while num_simulations > 0:
         ballots = []
 
@@ -129,8 +134,11 @@ def Cambridge_ballot_type_webapp(
             max_ballot_length,
             white_first_ballot_types_truncated,
             white_first_ballot_probs_truncated,
-            white_voter_candidate_ordering,
-            num_white_white_voters
+            'white_voter_candidate_ordering',
+            num_white_white_voters,
+            white_candidates,
+            poc_candidates,
+            voting_preferences
         )
         ballots.extend(new_ballots)
         # white voters poc first
@@ -138,8 +146,11 @@ def Cambridge_ballot_type_webapp(
             max_ballot_length,
             poc_first_ballot_types_truncated,
             poc_first_ballot_probs_truncated,
-            white_voter_candidate_ordering,
-            num_white_poc_voters
+            'white_voter_candidate_ordering',
+            num_white_poc_voters,
+            white_candidates,
+            poc_candidates,
+            voting_preferences
         )
         ballots.extend(new_ballots)
         # poc voters poc first
@@ -147,8 +158,11 @@ def Cambridge_ballot_type_webapp(
             max_ballot_length,
             poc_first_ballot_types_truncated,
             poc_first_ballot_probs_truncated,
-            poc_voter_candidate_ordering,
-            num_poc_poc_voters
+            'poc_voter_candidate_ordering',
+            num_poc_poc_voters,
+            white_candidates,
+            poc_candidates,
+            voting_preferences
         )
         ballots.extend(new_ballots)
         # poc voters white first
@@ -156,8 +170,11 @@ def Cambridge_ballot_type_webapp(
             max_ballot_length,
             white_first_ballot_types_truncated,
             white_first_ballot_probs_truncated,
-            poc_voter_candidate_ordering,
-            num_poc_white_voters
+            'poc_voter_candidate_ordering',
+            num_poc_white_voters,
+            white_candidates,
+            poc_candidates,
+            voting_preferences
         )
         ballots.extend(new_ballots)
 
