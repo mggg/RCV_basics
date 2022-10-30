@@ -36,13 +36,13 @@ def _sample_ballots_for_voter_candidate_preference_group(max_ballot_length, pref
     if voter_candidate_orderings == 'white_voter_candidate_ordering':
         # define candidate preferences across voting groups
         candidate_orderings = {
-            'W': list(reversed(white_candidates) if white_white_pref == voting_agreement['identical'] else np.random.permutation(white_candidates)),
-            'C': list(reversed(poc_candidates) if white_poc_pref == voting_agreement['identical'] else np.random.permutation(poc_candidates))
+            'W': (lambda: list(reversed(white_candidates))) if white_white_pref == voting_agreement['identical'] else (lambda: list(np.random.permutation(white_candidates))),
+            'C': (lambda: list(reversed(poc_candidates))) if white_poc_pref == voting_agreement['identical'] else (lambda: list(np.random.permutation(poc_candidates)))
         }
     elif voter_candidate_orderings == 'poc_voter_candidate_ordering':
         candidate_orderings = {
-            'W': list(reversed(white_candidates) if poc_white_pref == voting_agreement['identical'] else np.random.permutation(white_candidates)),
-            'C': list(reversed(poc_candidates) if poc_poc_pref == voting_agreement['identical'] else np.random.permutation(poc_candidates))
+            'W': (lambda: list(reversed(white_candidates))) if poc_white_pref == voting_agreement['identical'] else (lambda: list(np.random.permutation(white_candidates))),
+            'C': (lambda: list(reversed(poc_candidates))) if poc_poc_pref == voting_agreement['identical'] else (lambda: list(np.random.permutation(poc_candidates)))
         }
     else:
         print('Cambridge Sampler, unrecognized voter candidate ordering: ', voter_candidate_orderings)
@@ -53,14 +53,18 @@ def _sample_ballots_for_voter_candidate_preference_group(max_ballot_length, pref
         p=pref_type_probs,
     )
     ballots_with_candidates = []
+    i = 0
     for tuple_ballot in selected_ballots:
         selected_ballot = list(tuple_ballot)
+        i += 1
         trimmed_selected_ballot = selected_ballot[:max_ballot_length]
         ballot_with_candidates = []
         w_ind = 0
         c_ind = 0
         for candidate_type in trimmed_selected_ballot:
-            candidate_type_ordering = candidate_orderings[candidate_type]
+            a = candidate_orderings[candidate_type]
+            candidate_type_ordering = candidate_orderings[candidate_type]()
+            print(candidate_type_ordering) if (i % 10 == 0) else ''
             relevant_ind = w_ind if candidate_type == 'W' else c_ind
             if (relevant_ind >= len(candidate_type_ordering)):
                 break
