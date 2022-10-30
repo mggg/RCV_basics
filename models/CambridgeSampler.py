@@ -53,10 +53,8 @@ def _sample_ballots_for_voter_candidate_preference_group(max_ballot_length, pref
         p=pref_type_probs,
     )
     ballots_with_candidates = []
-    i = 0
     for tuple_ballot in selected_ballots:
         selected_ballot = list(tuple_ballot)
-        i += 1
         trimmed_selected_ballot = selected_ballot[:max_ballot_length]
         ballot_with_candidates = []
         w_ind = 0
@@ -64,7 +62,6 @@ def _sample_ballots_for_voter_candidate_preference_group(max_ballot_length, pref
         for candidate_type in trimmed_selected_ballot:
             a = candidate_orderings[candidate_type]
             candidate_type_ordering = candidate_orderings[candidate_type]()
-            print(candidate_type_ordering) if (i % 10 == 0) else ''
             relevant_ind = w_ind if candidate_type == 'W' else c_ind
             if (relevant_ind >= len(candidate_type_ordering)):
                 break
