@@ -60,7 +60,6 @@ def _sample_ballots_for_voter_candidate_preference_group(max_ballot_length, pref
         w_ind = 0
         c_ind = 0
         for candidate_type in trimmed_selected_ballot:
-            a = candidate_orderings[candidate_type]
             candidate_type_ordering = candidate_orderings[candidate_type]()
             relevant_ind = w_ind if candidate_type == 'W' else c_ind
             if (relevant_ind >= len(candidate_type_ordering)):
