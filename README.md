@@ -1,8 +1,10 @@
 # Simulating Racially Polarized Ranked Choice Voting
 
-Copy and adapt `run_all_models_and_print_output.py` to cycle through all four models and all five scenarios. The results will be printed as rows of values separated by &s for easy input into LaTeX tables. 
+Copy and adapt `run_all_models_and_print_output.py` to cycle through all four models and all five scenarios. The results will be printed as rows of values separated by &s for easy input into LaTeX tables.
 
 In the `docs` directory, the `template_table.tex` file contains a basic template for recording these results, including a very brief overview of the models and a blank table with headers.
+
+To deploy an updated version of the server, see the section below on [deploy instructions](#deploying-the-rcv-api-server)
 
 ## Getting started
 
@@ -30,10 +32,9 @@ For first-time users of Heroku who need to set up accounts and install the Herok
 
 N.B. that heroku's auto-deploy will ignore the port used in the local flask app. This needs to be taken into account when connecting to the API via external web applications.
 
-
 ## Benchmarking
 
-To understand how runtimes vary across each RCV model, modify the  `benchmark_script.py` file to ensure that `main` calls the `benchmark` function once for each model_type.
+To understand how runtimes vary across each RCV model, modify the `benchmark_script.py` file to ensure that `main` calls the `benchmark` function once for each model_type.
 
 For a given model type, one can get line-level runtime performance by using the `line_profiler` package installed. For detailed documentation, see [here](https://github.com/pyutils/line_profiler). In general you should do the following:
 
@@ -48,5 +49,3 @@ For a given model type, one can get line-level runtime performance by using the 
 5. To view a `*.lprof` file again, run `python -m line_profiler path/to/*.lprof`.
 
 6. NOTE: when done profiling, remove the `@profile` decorators; they will leave the code in an invalid state outside of benchmarking.
-
-
